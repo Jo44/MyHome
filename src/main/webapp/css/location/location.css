@@ -1,0 +1,10 @@
+/* Input */
+#inputSearch {
+	width: 60%;
+}
+
+/* Google Map */
+#map {
+	display: none;
+	height: 400px;
+}

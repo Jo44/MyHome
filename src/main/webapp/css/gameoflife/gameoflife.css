@@ -1,0 +1,168 @@
+/* Game of Life */
+.cell {
+	width: 4px;
+	height: 4px;
+	border: 1px solid #1e1e1e;
+	display: inline-block;
+	margin-bottom: 1px;
+}
+
+.dead {
+	background-color: #1e1e1e; /* Couleur pour les cellules mortes */
+}
+
+.alive {
+	background-color: #9d9d9d; /* Couleur pour les cellules vivantes */
+}
+
+.new {
+    background-color: #00a000; /* Couleur pour les nouvelles cellules vivantes */
+}
+
+#grid-container {
+	display: grid;
+	grid-template-columns: repeat(var(--cols), 5px);
+	justify-content: center;
+	align-items: center;
+	overflow: auto;
+}
+
+#game-controls-arrow {
+	cursor: pointer;
+}
+
+#game-controls {
+	display: block;
+}
+
+#speed, #rows, #cols {
+	-webkit-appearance: none;
+	background: transparent;
+	border: 0px solid black;
+	box-sizing: border-box;
+	color: #ff0000;
+	cursor: pointer;
+	display: inline;
+	font: inherit;
+	margin: 5px 5px;
+	outline: none;
+	padding: 0px;
+	transition: opacity .2s;
+	width: 80px;
+}
+
+#speed:focus, #rows:focus, #cols:focus {
+	outline: none;
+}
+
+#speed::-webkit-slider-thumb, #rows::-webkit-slider-thumb, #cols::-webkit-slider-thumb
+	{
+	-webkit-appearance: none;
+	background: #333333;
+	border: 1px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+	cursor: pointer;
+	height: 14px;
+	margin-top: -3px;
+	width: 10px;
+}
+
+#speed::-webkit-slider-runnable-track, #rows::-webkit-slider-runnable-track,
+	#cols::-webkit-slider-runnable-track {
+	background: #888888;
+	border: 0.2px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+	cursor: pointer;
+	height: 10px;
+	width: 120px;
+}
+
+#speed:focus::-webkit-slider-runnable-track, #rows:focus::-webkit-slider-runnable-track,
+	#cols:focus::-webkit-slider-runnable-track {
+	background: #949494;
+}
+
+#speed::-moz-range-thumb, #rows::-moz-range-thumb, #cols::-moz-range-thumb
+	{
+	background: #333333;
+	border: 1px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+	cursor: pointer;
+	height: 14px;
+	width: 10px;
+}
+
+#speed::-moz-range-track, #rows::-moz-range-track, #cols::-moz-range-track
+	{
+	background: #888888;
+	border: 0.2px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+	cursor: pointer;
+	height: 10px;
+	width: 120px;
+}
+
+#speed::-moz-range-progress, #rows::-moz-range-progress, #cols::-moz-range-progress
+	{
+	background: transparent;
+	height: 0;
+}
+
+#speed::-ms-thumb, #rows::-ms-thumb, #cols::-ms-thumb {
+	background: #333333;
+	border: 1px solid black;
+	border-radius: 3px;
+	height: 14px;
+	width: 10px;
+}
+
+#speed::-ms-track, #rows::-ms-track, #cols::-ms-track {
+	background: #888888;
+	border-color: transparent;
+	border-width: 0;
+	color: transparent;
+	cursor: pointer;
+	height: 10px;
+	width: 120px;
+}
+
+#speed::-ms-tooltip, #rows::-ms-tooltip, #cols::-ms-tooltip {
+	display: none;
+}
+
+#speed::-ms-fill-lower, #rows::-ms-fill-lower, #cols::-ms-fill-lower {
+	background: #888888;
+	border: 0.2px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+}
+
+#speed:focus::-ms-fill-lower, #rows:focus::-ms-fill-lower, #cols:focus::-ms-fill-lower
+	{
+	background: #949494;
+}
+
+#speed::-ms-fill-upper, #rows::-ms-fill-upper, #cols::-ms-fill-upper {
+	background: #888888;
+	border: 0.2px solid black;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px black, 0px 0px 1px black;
+}
+
+#speed:focus::-ms-fill-upper, #rows:focus::-ms-fill-upper, #cols:focus::-ms-fill-upper
+	{
+	background: #949494;
+}
+
+#speedValue, #rowsValue, #colsValue {
+	display: inline-block;
+	width: 30px;
+}
+
+#lifeCopyright {
+	color: #888;
+}

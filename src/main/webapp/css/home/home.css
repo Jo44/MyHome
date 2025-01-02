@@ -1,0 +1,17 @@
+/* Panel */
+.panel-home {
+	height: 500px;
+	line-height: 470px;
+	background-color: black;
+	background-image: url("../../img/home-background.jpg");
+	background-position: center;
+	background-repeat: repeat;
+}
+
+/* Hello World */
+#secret {
+	font-family: "lcd_solidregular", Consolas, sans-serif;
+	font-size: 1.6em;
+	cursor: -webkit-grab;
+	cursor: grab;
+}

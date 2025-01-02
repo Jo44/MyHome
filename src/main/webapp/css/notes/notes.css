@@ -1,0 +1,39 @@
+/* Formulaire */
+#newNoteForm {
+	margin-top: 0px;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+/* Title Input */
+#textTitle {
+	width: 100%;
+	max-width: 300px;
+}
+
+/* Text Area */
+.areaNicEdit {
+	color: black;
+	background-color: #888;
+	cursor: pointer;
+}
+
+#areaComment {
+	margin-top: 5px;
+	margin-bottom: 20px;
+	width: 100%;
+	resize: vertical;
+	text-align: left;
+}
+
+.nicEdit-pane {
+	color: black;
+}
+
+/* Message Box */
+.message-box {
+	border-top: 1px solid black;
+	font-size: 0.9em;
+	padding: 10px;
+	text-align: justify;
+}

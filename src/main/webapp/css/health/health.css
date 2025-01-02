@@ -1,0 +1,245 @@
+/* Health */
+
+/* Panels */
+.panel-body {
+	padding-left: 0px;
+	padding-right: 0px;
+	padding: 0px;
+}
+
+/* Links */
+.panel-body a, .panel-body a:hover, .panel-body a:focus, .panel-body a:active
+	{
+	color: #ddd;
+}
+
+/* Images + Labels */
+.info-block {
+	padding: 0px;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+/* Images */
+.info-img {
+	background-color: #555;
+	border: 1px solid black;
+	border-radius: 5px;
+	height: 100px;
+	width: 100px;
+}
+
+/* Labels */
+.info-label {
+	white-space: nowrap;
+	font-weight: bold;
+	font-size: 0.8em;
+}
+
+/* Activity Input */
+#textActivity {
+	width: 100%;
+	max-width: 250px;
+	margin-left: 2px;
+}
+
+/* Food */
+#lbCount {
+	display: inline-block;
+	margin: 0px 10px;
+}
+
+/* Chrono */
+#periodLeft, #totalLeft, #totalPast, #configPanel input, #customPanel input, #customTime {
+	font-family: 'digital', Arial, sans-serif;
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* Chrono Buttons */
+#btnPanel {
+	margin-top: 10px;
+}
+
+#btnPanel button {
+	margin: 0px 20px;
+}
+
+/* Chrono Panel */
+#chronoBckgnd {
+	background-color: #585858;
+	border: 3px solid black;
+	border-radius: 7px;
+	color: black;
+	padding: 10px 0px;
+	margin: 10px auto;
+	width: 300px;
+}
+
+#periodLeft {
+	font-size: 52px;
+	line-height: 60px;
+}
+
+#state {
+	margin-bottom: 10px;
+}
+
+#totalLeft, #totalPast {
+	font-size: 28px;
+	line-height: 28px;
+}
+
+/* Chrono Global */
+#chronoDetailsArrow {
+	cursor: pointer;
+}
+
+#chronoDetails {
+	display: none;
+}
+
+#configPanel, #presetPanel, #customPanel {
+	padding: 0px;
+}
+
+#configBckgnd, #presetBckgnd, #customBckgnd {
+	background-color: #585858;
+	border: 1px solid black;
+	border-radius: 5px;
+	color: black;
+	margin: 10px auto;
+	height: 100px;
+	width: 170px;
+}
+
+#presetForm, #customForm {
+	margin: 0px 0px 0px 6px;
+	text-align: left;
+}
+
+/* Chrono Config*/
+@media ( min-width : 768px) {
+	#configPanel {
+		padding-left: 32px;
+	}
+}
+
+#configForm {
+	margin: 6px 0px;
+}
+
+#delay {
+	position: relative;
+	top: 1px;
+	font-size: 18px;
+	height: 20px;
+	margin: 2px 5px;
+	width: 40px;
+}
+
+/* Chrono Preset */
+#presetForm {
+	margin: 6px 0px 0px 30px;
+}
+
+#presetForm input[type=radio] {
+	border: 0px;
+	width: 12px;
+	height: 12px;
+}
+
+#presetForm input[type=radio]:checked+label:after {
+	border: 1px solid black;
+	border-radius: 11px;
+	width: 13px;
+	height: 12px;
+	position: absolute;
+	top: 0px;
+	left: -21px;
+	content: " ";
+	display: block;
+	background: #333333;
+}
+
+#presetForm label {
+	position: relative;
+	bottom: 2px;
+	left: 5px;
+	font-weight: normal;
+	line-height: 10px;
+}
+
+/* Chrono Custom */
+@media ( min-width : 768px) {
+	#customPanel {
+		padding-right: 32px;
+	}
+}
+
+#customPanel input {
+	position: relative;
+	top: 1px;
+	font-size: 18px;
+	height: 20px;
+	margin: 2px 5px;
+}
+
+#effortPeriod, #restPeriod, #customTime {
+	width: 102px;
+}
+
+#effortPeriod::-webkit-datetime-edit-hour-field:focus, #restPeriod::-webkit-datetime-edit-hour-field:focus, #customTime::-webkit-datetime-edit-hour-field:focus,
+	#effortPeriod::-webkit-datetime-edit-minute-field:focus, #restPeriod::-webkit-datetime-edit-minute-field:focus, #customTime::-webkit-datetime-edit-minute-field:focus,
+	#effortPeriod::-webkit-datetime-edit-second-field:focus, #restPeriod::-webkit-datetime-edit-second-field:focus, #customTime::-webkit-datetime-edit-second-field:focus {
+	background-color: #444444;
+}
+
+#effortPeriod::-webkit-clear-button, #restPeriod::-webkit-clear-button, #customTime::-webkit-clear-button,
+	#effortPeriod::-webkit-inner-spin-button, #restPeriod::-webkit-inner-spin-button, #customTime::-webkit-inner-spin-button
+	{
+	display: none;
+}
+
+#effortPeriod::-webkit-calendar-picker-indicator, #restPeriod::-webkit-calendar-picker-indicator, #customTime::-webkit-calendar-picker-indicator {
+	background: none;
+	display: none;
+}
+
+#repeats {
+	position: relative;
+	top: 1px;
+	font-size: 18px;
+	height: 20px;
+	margin: 2px 0px;
+	width: 40px;
+}
+
+/* Food Chrono */
+#customTime {
+	position: relative;
+	top: 1px;
+	font-size: 18px;
+	height: 30px;
+	margin: 2px 5px;
+}
+
+#btnGo {
+	margin: 0px 10px;
+	width: 50px;
+}
+
+/* Weight */
+#numberWeight {
+	width: 60px;
+	max-width: 80px;
+	margin-left: 2px;
+}
+
+#fromToBloc {
+	margin-top: 10px;
+}
+
+#toDateTimeLabel {
+	margin-left: 10px;
+}

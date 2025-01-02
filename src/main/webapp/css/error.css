@@ -1,0 +1,28 @@
+/* Messages */
+h2 {
+	color: #999;
+	margin-top: 10%;
+}
+
+h3 {
+	color: #999;
+	margin-top: 60px;
+}
+
+h4 {
+	color: white;
+	font-style: italic;
+	margin-top: 20px;
+}
+
+/* Links */
+.grey-link, .grey-link:focus, .grey-link:visited, .grey-link:hover,
+	.grey-link:active {
+	text-decoration: none;
+	color: #999;
+}
+
+/* Marged */
+.marged-top {
+	margin-top: 50px;
+}

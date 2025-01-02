@@ -1,0 +1,34 @@
+# Eclipse
+.classpath
+.project
+.settings/
+how-to-deploy.readme
+
+# Compile
+target/*
+/target/
+
+# SQL
+src/main/resources/sql/
+src/test/resources/sql/
+*.sql
+
+# Hibernate
+hibernate.cfg.xml
+
+# Properties
+*.properties
+
+# OAuth
+src/main/resources/oauth/
+client_secrets.json
+
+# CSS Plugins
+src/main/webapp/css/plugins/
+
+# JS Plugins
+src/main/webapp/js/plugins/
+
+# INF
+src/main/webapp/META-INF/
+src/main/webapp/WEB-INF/

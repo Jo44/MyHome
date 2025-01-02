@@ -1,0 +1,149 @@
+/* General */
+.container {
+	margin-top: 10%;
+}
+
+/* Panels */
+.panel-default {
+	background-color: #222;
+	border-color: black;
+	color: #bbb;
+	min-width: 360px; /* pour affichage correct des reCaptcha */
+}
+
+.panel-default>.panel-heading {
+	background-color: #080808;
+	border-color: black;
+	color: #ddd;
+}
+
+.padding-body {
+	background-color: #333;
+	padding-top: 50px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 50px;
+}
+
+/* Alert Error */
+.alert-error {
+	color: #222;
+	background-color: #f0ad4e;
+	border-color: #eea236;
+	font-weight: bold;
+}
+
+/* Language Box */
+.lang-box {
+	position: absolute;
+	top: 0;
+	right: 10%;
+	z-index: 999;
+}
+
+#lang-menu, #lang-menu ul {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	text-align: center;
+}
+
+#lang-menu li {
+	display: inline-block;
+	position: relative;
+	min-width: 60px;
+	border-radius: 0;
+}
+
+#lang-menu ul li {
+	display: inherit;
+	border-radius: 0;
+}
+
+#lang-menu ul li:hover {
+	border-radius: 0;
+}
+
+#lang-menu ul li:last-child {
+	border-radius: 0 0 5px 5px;
+}
+
+#lang-menu ul {
+	position: absolute;
+	z-index: 999;
+	max-height: 0;
+	left: 0;
+	right: 0;
+	overflow: hidden;
+	-moz-transition: .3s all .1s;
+	-webkit-transition: .3s all .1s;
+	transition: .3s all .1s;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+
+#lang-menu li:hover ul {
+	max-height: 8em;
+}
+
+#lang-menu li {
+	background-color: #191919;
+}
+
+#lang-menu li li {
+	background: #2d2d2d;
+}
+
+#lang-menu li:hover, #lang-menu li li:hover {
+	background: #080808;
+}
+
+#lang-menu a {
+	text-decoration: none;
+	display: block;
+	padding: 5px 5px;
+	color: #999;
+}
+
+#lang-menu a:hover {
+	color: white;
+}
+
+#lang-menu>li>a {
+	border: 1px solid black;
+}
+
+#lang-menu ul a {
+	padding: 0 0;
+	line-height: 30px;
+}
+
+#lang-menu ul a:last-child {
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+/* Boutons */
+.btn-md, .btn-md:focus, .btn-md:hover, .btn-md:visited, .btn-md:active,
+	.btn-md:active:focus, .btn-md:active:hover {
+	padding: 6px 10px;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 1.5;
+	border-radius: 4px;
+	color: black;
+}
+
+/* Liens */
+.login-link, .login-link:focus, .login-link:visited, .login-link:active
+	{
+	text-decoration: none;
+	color: #666;
+	font-style: italic;
+	font-size: 0.85em;
+}
+
+.login-link:hover {
+	color: #bbb;
+}

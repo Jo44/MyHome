@@ -1,0 +1,75 @@
+/* Snake */
+html {
+  overflow: hidden;
+}
+
+canvas {
+	border: 2px solid #888;
+	margin: 10px auto;
+}
+
+#scoreDisplay {
+	display: block;
+	font-size: 14px;
+	font-family: 'digital';
+	letter-spacing: 1px;
+	text-align: center;
+}
+
+#gameControls {
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 6px;
+}
+
+#level, #speed {
+	background: #4b4b4b;
+	color: #ddd;
+	border-color: black;
+	margin: 3px 10px;
+	height: 30px;
+	width: 100px;
+	text-align: center;
+	padding: 5px;
+	font-size: 14px;
+	font-family: 'digital';
+}
+
+#level:hover, #speed:hover {
+	cursor: pointer;
+}
+
+#audioControls {
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 300px;
+    margin: 0px auto 5px auto;
+}
+
+#audioControls button {
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    cursor: pointer;
+}
+
+#volumeControl {
+	display: block;
+	position: relative;
+	bottom: 10px;
+	font-size: 14px;
+	font-family: 'digital';
+	letter-spacing: 1px;
+	text-align: center;
+}
+
+#muteMusic {
+    background-image: url('../../img/snake/mute-music-off.png');
+}
+
+#muteFx {
+    background-image: url('../../img/snake/mute-fx-off.png');
+}

@@ -1,0 +1,68 @@
+/* Panel */
+.panel-top {
+	margin-top: 20px;
+}
+
+/* Formulaire */
+#newFileForm {
+	margin-top: 10px;
+}
+
+/* Bouton */
+.btn-group {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+/* Input File */
+.label-file {
+	background-color: #3c3c3c;
+	border: 1px solid black;
+	border-radius: 3px;
+	color: #449d44;
+	text-shadow: 1px 1px 2px black;
+	font-weight: bold;
+	margin: 6px 10px;
+	padding: 6px 10px;
+}
+
+.label-file:hover {
+	background-color: #2c2c2c;
+	color: #398439;
+	cursor: pointer;
+}
+
+#fileInput {
+	display: none;
+}
+
+/* Progress Bar */
+.progress {
+	max-width: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.progress-bar {
+	background-color: #276aa2;
+}
+
+.progress-bar-warning {
+	background-color: #ec971f;
+}
+
+.progress-bar-alert {
+	background-color: #bd403c;
+}
+
+.progress-bar-value {
+	color: white;
+	text-shadow: 1px 1px 2px black;
+	font-weight: bold;
+}
+
+.progress-bar-value-inverted {
+	color: black;
+	text-shadow: 1px 1px 2px white;
+	font-weight: bold;
+}

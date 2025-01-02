@@ -1,0 +1,44 @@
+/* Phone Flags */
+.iti-flag {
+	background-image: url('../../img/flag/flags.png');
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2) , only screen and
+		(min--moz-device-pixel-ratio: 2) , only screen and
+		(-o-min-device-pixel-ratio: 2 / 1) , only screen and
+		(min-device-pixel-ratio: 2) , only screen and (min-resolution: 192dpi)
+		, only screen and (min-resolution: 2dppx) {
+	.iti-flag {
+		background-image: url('../../img/flag/flags@2x.png');
+	}
+}
+
+/* Inputs */
+.inputWithIcon input {
+	padding-left: 25px;
+	width: 180px;
+	text-align: left;
+}
+
+.inputWithIcon {
+	position: relative;
+	left: 10px;
+}
+
+.inputWithIcon i {
+	position: relative;
+	top: 0;
+	right: 185px;
+	padding: 9px 8px;
+	color: #aaa;
+}
+
+#textPhone {
+	width: 180px;
+	text-align: left;
+}
+
+/* List Icons */
+.twitter-marged {
+	margin-right: 3px;
+}

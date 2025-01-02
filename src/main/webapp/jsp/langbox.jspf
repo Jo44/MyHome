@@ -1,0 +1,36 @@
+<%
+	String servletPath = (String) request.getAttribute("javax.servlet.forward.request_uri");
+	String queryString = (String) request.getAttribute("javax.servlet.forward.query_string");
+	String queryEnLang = "";
+	String queryFrLang = "";
+	
+	if (queryString == null || queryString.startsWith("lang=")) {
+		queryEnLang = "?lang=en";
+		queryFrLang = "?lang=fr";
+	} else {
+		int index = queryString.lastIndexOf("&lang=");
+		if (index != -1) {
+			queryString = queryString.substring(0, index);
+		}
+		queryEnLang = "?" + queryString + "&lang=en";
+		queryFrLang = "?" + queryString + "&lang=fr";
+	}
+%>
+	<ul id="lang-menu">
+		<li><a class="unselectable">
+			<c:choose>
+				<c:when test="${sessionScope.lang == 'fr'}">
+					<img id="lang-flag" class="flag-img" src="<%=path%>/img/flag/flag-france.png" alt="FR" />
+				</c:when>
+				<c:otherwise>
+					<img id="lang-flag" class="flag-img" src="<%=path%>/img/flag/flag-us.png" alt="US" />
+				</c:otherwise>
+			</c:choose>
+			 <b class="caret"></b></a>
+			<ul>
+				<li><a href="<%=servletPath%><%=queryEnLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-us.png" alt="US" /><span class="flag-label">US</span></a></li>
+				<li><a href="<%=servletPath%><%=queryFrLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-france.png" alt="FR" /><span class="flag-label">FR</span></a></li>
+			</ul>
+		</li>
+	</ul>
+	<!-- End Language Box -->

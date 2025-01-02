@@ -1,0 +1,22 @@
+/* Previous Message */
+.info-contact {
+	background-color: #222;
+	border: 1px solid black;
+	border-radius: 4px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.info-contact p {
+	text-align: center;
+	margin: 10px;
+	color: #9d9d9d;
+}
+
+/* Text Area */
+#areaContact {
+	resize: none;
+	width: 90%;
+	text-align: justify;
+	padding: 10px;
+}

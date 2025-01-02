@@ -1,0 +1,73 @@
+<%
+	String servletPath = (String) request.getAttribute("javax.servlet.forward.request_uri");
+	String queryString = (String) request.getAttribute("javax.servlet.forward.query_string");
+	String queryEnLang = "";
+	String queryFrLang = "";
+	
+	if (queryString == null || queryString.startsWith("lang=")) {
+		queryEnLang = "?lang=en";
+		queryFrLang = "?lang=fr";
+	} else {
+		int index = queryString.lastIndexOf("&lang=");
+		if (index != -1) {
+			queryString = queryString.substring(0, index);
+		}
+		queryEnLang = "?" + queryString + "&lang=en";
+		queryFrLang = "?" + queryString + "&lang=fr";
+	}
+%>
+			<nav class="navbar navbar-inverse navbar-fixed-top unselectable">
+			<!-- Top Menu Title -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+					<span class="sr-only"><fmt:message key="global.myhome" /></span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="<%=path%>/home"><fmt:message key="global.myhome" /></a>
+			</div>
+			<!-- Top Menu Items -->
+			<ul class="nav navbar-right top-nav">
+				<li class="dropdown"><a href="<%=path%>/search"><i class="fas fa-search fa-fw"></i></a></li>
+				<!-- Language Box -->
+				<li class="dropdown lang-fixe"><a href="" class="dropdown-toggle" data-toggle="dropdown">
+					<c:choose>
+						<c:when test="${sessionScope.lang == 'fr'}">
+							<img src="<%=path%>/img/flag/flag-france.png" alt="FR" />
+						</c:when>
+						<c:otherwise>
+							<img src="<%=path%>/img/flag/flag-us.png" alt="US" />
+						</c:otherwise>
+					</c:choose>
+					 <b class="caret"></b></a>
+					<ul class="dropdown-menu dropdown-lang">
+						<li><a href="<%=servletPath%><%=queryEnLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-us.png" alt="US" /><span class="flag-label">US</span></a></li>
+						<li><a href="<%=servletPath%><%=queryFrLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-france.png" alt="FR" /><span class="flag-label">FR</span></a></li>
+					</ul>
+				</li>
+				<!-- End Language Box -->
+				<li class="dropdown"><a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fas fa-user fa-fw"></i> <%=user.getName()%> <b class="caret"></b></a>
+					<ul class="dropdown-menu dropdown-user">
+						<li><a href="<%=path%>/settings"><i class="fas fa-cogs fa-fw"></i> <fmt:message key="menu.settings" /></a></li>
+						<li><a href="<%=path%>/help"><i class="fas fa-question-circle fa-fw"></i> <fmt:message key="menu.help" /></a></li>
+						<li><a href="<%=path%>/disconnect"><i class="fas fa-power-off fa-fw"></i> <fmt:message key="menu.disconnect" /></a></li>
+					</ul>
+				</li>
+				<li class="dropdown"><a id="clock" href=""></a></li>
+			</ul>
+			<!-- Sidebar Menu Items -->
+			<div class="collapse navbar-collapse navbar-ex1-collapse">
+				<ul class="nav navbar-nav side-nav">
+					<li><a href="<%=path%>/home"><i class="fas fa-home fa-fw"></i> <fmt:message key="menu.home" /></a></li>
+					<li><a href="<%=path%>/contacts"><i class="fas fa-address-book fa-fw"></i> <fmt:message key="menu.contacts" /></a></li>
+					<li><a href="<%=path%>/files"><i class="fas fa-copy fa-fw"></i> <fmt:message key="menu.files" /></a></li>
+					<li><a href="<%=path%>/game_of_life"><i class="fa fa-bug fa-fw"></i> <fmt:message key="menu.game.life" /></a></li>
+					<li><a href="<%=path%>/location"><i class="fas fa-sitemap fa-fw"></i> <fmt:message key="menu.location" /></a></li>
+					<li><a href="<%=path%>/notes"><i class="fas fa-edit fa-fw"></i> <fmt:message key="menu.notes" /></a></li>
+					<li><a href="<%=path%>/health"><i class="fas fa-heartbeat fa-fw"></i> <fmt:message key="menu.health" /></a></li>
+					<li><a href="<%=path%>/snake"><i class="fas fa-dragon fa-fw"></i> <fmt:message key="menu.snake" /></a></li>
+					<li><a href="<%=path%>/status_inside"><i class="fas fa-wrench fa-fw"></i> <fmt:message key="menu.status" /></a></li>
+					<li><a href="<%=path%>/youtube_player"><i class="fab fa-youtube fa-fw"></i> <fmt:message key="menu.youtube" /></a></li>
+					<li><a href="<%=path%>/infos"><i class="fas fa-info-circle fa-fw"></i> <fmt:message key="menu.infos" /></a></li>
+				</ul>
+			</div>
+		</nav>
+		<!-- End Navigation -->
