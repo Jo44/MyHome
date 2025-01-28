@@ -3,34 +3,38 @@ package fr.my.home.filter;
 import java.io.IOException;
 import java.util.Locale;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Filtre qui permet de définir le langage via un paramètre de requête ou via la localisation de la requête
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class LocalizationFilter implements Filter {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(LocalizationFilter.class);
 
-	// Initialisation
-
+	/**
+	 * Initialisation
+	 */
 	@Override
 	public void init(FilterConfig fc) throws ServletException {}
-
-	// Filter
 
 	/**
 	 * Filter
@@ -45,12 +49,10 @@ public class LocalizationFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest hsreq = (HttpServletRequest) request;
 		HttpSession session = hsreq.getSession(false);
-
 		// Initialise la session si inexistante
 		if (session == null) {
 			session = hsreq.getSession(true);
 		}
-
 		// Vérifie l'état de la session
 		if (session != null) {
 			// Si la session est ouverte, vérifie si un paramètre 'lang' est présent dans la requête
@@ -75,12 +77,9 @@ public class LocalizationFilter implements Filter {
 				}
 			}
 		}
-
 		// Laisse passer la requête
 		chain.doFilter(request, response);
 	}
-
-	// Method
 
 	/**
 	 * Récupère la langue à partir de la locale de la requête
@@ -100,8 +99,9 @@ public class LocalizationFilter implements Filter {
 		return lang;
 	}
 
-	// Destroy
-
+	/**
+	 * Destroy
+	 */
 	@Override
 	public void destroy() {}
 

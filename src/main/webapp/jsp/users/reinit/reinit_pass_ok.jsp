@@ -1,7 +1,3 @@
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -10,21 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
-<!-- Redirection automatique aprÃ¨s 5 secondes -->
-<meta http-equiv="refresh" content="5; url=<%=path%>/disconnect" />
+<!-- Redirection automatique après 5 secondes -->
+<meta http-equiv="refresh" content="5; url=${pageContext.request.contextPath}/disconnect" />
 <title><fmt:message key="reinit.valid.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap Core CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- CSS My Home -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- CSS Perso -->
-<link href="<%=path%>/css/users/users.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/users/users.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div class="lang-box">
-		<!-- Language Box -->
-		<%@include file="../../langbox.jspf"%>
+	<!-- Language Box -->
+	<%@include file="../../langbox.jspf"%>
 	</div>
 	<div class="container">
 		<div class="row">
@@ -34,11 +30,13 @@
 						<h3 class="panel-title in-line"><fmt:message key="reinit.valid.header" /></h3>
 					</div>
 					<div class="padding-body center">
+						<!-- Message -->
 						<p><fmt:message key="reinit.valid.msg1" /></p>
 						<br />
 						<p><fmt:message key="reinit.valid.msg2" /></p>
 						<br />
-						<p><a class="login-link" href="<%=path%>/disconnect"><fmt:message key="reinit.valid.msg3" /></a></p>
+						<p><a class="login-link" href="${pageContext.request.contextPath}/disconnect"><fmt:message key="reinit.valid.msg3" /></a></p>
+						<!-- End Message -->
 					</div>
 					<div class="panel-footer"></div>
 				</div>

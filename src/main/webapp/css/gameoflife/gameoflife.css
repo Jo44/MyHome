@@ -19,7 +19,7 @@
     background-color: #00a000; /* Couleur pour les nouvelles cellules vivantes */
 }
 
-#grid-container {
+#life {
 	display: grid;
 	grid-template-columns: repeat(var(--cols), 5px);
 	justify-content: center;
@@ -158,9 +158,13 @@
 	background: #949494;
 }
 
-#speedValue, #rowsValue, #colsValue {
+#speedText, #rowsText, #colsText {
 	display: inline-block;
-	width: 30px;
+	width: 20px;
+}
+
+#speedText {
+	text-align: right;
 }
 
 #lifeCopyright {

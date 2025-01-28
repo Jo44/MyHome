@@ -1,106 +1,56 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
- * Bean YouTubePlaylist qui stocke les informations d'une playlist YouTube (pour transfert JSP)
+ * Bean YouTubePlaylist
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
-public class YouTubePlaylist implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
+public class YouTubePlaylist {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private String id;
 	private String title;
 	private String description;
-	private String urlImage;
+	private String url_image;
 	private String privacy;
 	private boolean active;
-	private Timestamp publishedAt;
-	private int totalResults;
-	private String prevPageToken;
-	private String nextPageToken;
-
-	// Constructors
+	private Timestamp published_at;
+	private int total_results;
+	private String prev_page_token;
+	private String next_page_token;
 
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public YouTubePlaylist() {
-		super();
-	}
+	public YouTubePlaylist() {}
 
 	/**
-	 * Constructor
-	 * 
-	 * @param id
-	 * @param title
-	 * @param description
-	 * @param urlImage
-	 * @param privacy
-	 * @param active
-	 * @param publishedAt
-	 * @param totalResults
-	 * @param prevPageToken
-	 * @param nextPageToken
+	 * Constructeur
 	 */
-	public YouTubePlaylist(String id, String title, String description, String urlImage, String privacy, boolean active, Timestamp publishedAt,
-			int totalResults, String prevPageToken, String nextPageToken) {
-		this();
+	public YouTubePlaylist(String id, String title, String description, String url_image, String privacy, boolean active, Timestamp published_at,
+			int total_results, String prev_page_token, String next_page_token) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
-		this.urlImage = urlImage;
+		this.url_image = url_image;
 		this.privacy = privacy;
 		this.active = active;
-		this.publishedAt = publishedAt;
-		this.totalResults = totalResults;
-		this.prevPageToken = prevPageToken;
-		this.nextPageToken = nextPageToken;
+		this.published_at = published_at;
+		this.total_results = total_results;
+		this.prev_page_token = prev_page_token;
+		this.next_page_token = next_page_token;
 	}
-
-	// Methods
 
 	/**
-	 * To String
+	 * Getters/Setters
 	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(id);
-		sb.append(" , Title: ");
-		sb.append(title);
-		sb.append(" , Description: ");
-		sb.append(description);
-		sb.append(" , URL Image: ");
-		sb.append(urlImage);
-		sb.append(" , Privacy: ");
-		sb.append(privacy);
-		sb.append(" , Active: ");
-		sb.append(String.valueOf(active));
-		sb.append(" , Published At: ");
-		if (publishedAt != null) {
-			sb.append(publishedAt.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Total Results: ");
-		sb.append(String.valueOf(totalResults));
-		sb.append(" , Previous Page Token: ");
-		sb.append(prevPageToken);
-		sb.append(" , Next Page Token: ");
-		sb.append(nextPageToken);
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters/Setters
 
 	public String getId() {
 		return id;
@@ -110,12 +60,16 @@ public class YouTubePlaylist implements Serializable {
 		return title;
 	}
 
+	public String getShortTitle() {
+		return title.length() > 30 ? title.substring(0, 30) + ".." : title;
+	}
+
 	public String getDescription() {
 		return description;
 	}
 
 	public String getUrlImage() {
-		return urlImage;
+		return url_image;
 	}
 
 	public String getPrivacy() {
@@ -127,7 +81,7 @@ public class YouTubePlaylist implements Serializable {
 	}
 
 	public Timestamp getPublishedAt() {
-		return publishedAt;
+		return published_at;
 	}
 
 	public void setActive(boolean active) {
@@ -135,15 +89,15 @@ public class YouTubePlaylist implements Serializable {
 	}
 
 	public int getTotalResults() {
-		return totalResults;
+		return total_results;
 	}
 
 	public String getPrevPageToken() {
-		return prevPageToken;
+		return prev_page_token;
 	}
 
 	public String getNextPageToken() {
-		return nextPageToken;
+		return next_page_token;
 	}
 
 }

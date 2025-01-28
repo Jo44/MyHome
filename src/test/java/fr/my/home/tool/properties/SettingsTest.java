@@ -11,11 +11,13 @@ import org.junit.jupiter.api.Test;
  * Classe SettingsTest qui charge en mémoire les paramètres de l'application via un fichier 'settings.properties'
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class SettingsTest {
 
-	// Constructeur
+	/**
+	 * Constructeur
+	 */
 	public SettingsTest() {
 		super();
 	}

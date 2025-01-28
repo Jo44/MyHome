@@ -1,112 +1,77 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean Sport que peut enregistrer une activité
+ * Bean Sport
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "sport")
-public class Sport implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private int idUser;
-	private String activity;
-	private Timestamp saveDate;
-
-	// Constructors
+@Table(name = "sports")
+public class Sport {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public Sport() {
-		super();
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param idUser
-	 * @param activity
-	 * @param saveDate
-	 */
-	public Sport(int idUser, String activity, Timestamp saveDate) {
-		this();
-		this.idUser = idUser;
-		this.activity = activity;
-		this.saveDate = saveDate;
-	}
-
-	// Methods
-
-	/**
-	 * To String
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , User: ");
-		sb.append(String.valueOf(idUser));
-		sb.append(" , Activity: ");
-		if (activity != null) {
-			sb.append(activity);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Save Date: ");
-		if (saveDate != null) {
-			sb.append(saveDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
 
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "sport_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "id_user", nullable = false)
+	private int id_user;
+	@Column(name = "activity", nullable = false)
+	private String activity;
+	@Column(name = "save_date", nullable = false)
+	private Timestamp save_date;
+
+	/**
+	 * Constructeur
+	 */
+	public Sport() {}
+
+	/**
+	 * Constructeur
+	 * 
+	 * @param id_user
+	 * @param activity
+	 * @param save_date
+	 */
+	public Sport(int id_user, String activity, Timestamp save_date) {
+		this.id_user = id_user;
+		this.activity = activity;
+		this.save_date = save_date;
+	}
+
+	/**
+	 * Getters/Setters
+	 */
+
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "sport_id_user")
 	public int getIdUser() {
-		return idUser;
+		return id_user;
 	}
 
-	@SuppressWarnings("unused")
-	private void setIdUser(int idUser) {
-		this.idUser = idUser;
+	public void setIdUser(int id_user) {
+		this.id_user = id_user;
 	}
 
-	@Column(name = "sport_activity")
 	public String getActivity() {
 		return activity;
 	}
@@ -115,14 +80,16 @@ public class Sport implements Serializable {
 		this.activity = activity;
 	}
 
-	@Column(name = "sport_save_date")
 	public Timestamp getSaveDate() {
-		return saveDate;
+		return save_date;
 	}
 
-	@SuppressWarnings("unused")
-	private void setSaveDate(Timestamp saveDate) {
-		this.saveDate = saveDate;
+	public String getSaveDateJS() {
+		return save_date.toLocalDateTime().toString();
+	}
+
+	public void setSaveDate(Timestamp save_date) {
+		this.save_date = save_date;
 	}
 
 }

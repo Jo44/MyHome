@@ -14,9 +14,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,19 +29,23 @@ import fr.my.home.exception.files.NoSentFileException;
 import fr.my.home.exception.files.NotExistException;
 import fr.my.home.exception.files.RequestSizeException;
 import fr.my.home.tool.properties.Settings;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 /**
  * Manager qui prends en charge la gestion des fichiers
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class FilesManager {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(FilesManager.class);
-
-	// Attributes
-
 	private static final String MYHOME_PATH = System.getenv("MYHOME");
 	private static final int FILES_BUFFER_SIZE = Settings.getIntProperty("files.buffer.size"); // 10 ko
 	private static final long FILES_MAX_FILE_SIZE = Settings.getLongProperty("files.max.file.size"); // 100 Mo
@@ -52,17 +53,13 @@ public class FilesManager {
 	private static final String FILES_FOLDER = Settings.getStringProperty("files.folder");
 	private FileDAO fileDAO;
 
-	// Constructors
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
 	public FilesManager() {
 		super();
 		fileDAO = new FileDAO();
 	}
-
-	// Methods
 
 	/**
 	 * Récupère la liste des fichiers pour l'utilisateur connecté

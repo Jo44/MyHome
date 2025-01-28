@@ -7,22 +7,19 @@ import fr.my.home.exception.TechnicalException;
  * Interface HibernateDAO qui déclare les 3 méthodes génériques CREATE / UPDATE / DELETE
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public interface HibernateDAO<T> {
 
-	// Methods
-
 	/**
-	 * Ajoute un nouvel objet en base et renvoi son ID
+	 * Ajoute un nouvel objet
 	 * 
 	 * @param object
-	 * @return int
 	 * @throws FonctionnalException
 	 * @throws TechnicalException
 	 */
-	public int add(T object) throws FonctionnalException, TechnicalException;
+	public void add(T object) throws FonctionnalException, TechnicalException;
 
 	/**
 	 * Met à jour un objet

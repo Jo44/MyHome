@@ -1,12 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	String error = (String) view.getValueForKey("error");
-	String success = (String) view.getValueForKey("success");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -16,13 +7,13 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="settings.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -37,32 +28,31 @@
 							<div class="panel-heading">
 								<i class="fas fa-cogs fa-fw"></i> <fmt:message key="settings.header" />
 								<div class="pull-right">
-									<a class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/home"><fmt:message key="global.back" /></a>
+									<a class="btn btn-primary btn-xs btn-fixed" href="${pageContext.request.contextPath}/home"><fmt:message key="global.back" /></a>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
 							<div class="panel-body">
-								<%
-									if (error != null) {
-								%>
-								<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger panel-notification center" role="alert">
-									<p><strong>Oops ! </strong><%=error%><i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
-								</div>
-								<%
-									} else if (success != null) {
-								%>
-								<div id="alert-success" class="col-xs-offset-1 col-xs-10 alert alert-success panel-notification center" role="alert">
-									<p><%=success%><i id="close-alert-success" class="fas fa-times-circle fa-fw close-button light-grey"></i></p>
-								</div>
-								<%
-									}
-								%>
+								<c:choose>
+								    <c:when test="${not empty requestScope.error}">
+										<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger panel-notification center" role="alert">
+											<p><strong>Oops ! </strong>${requestScope.error}<i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
+										</div>
+									</c:when>
+									<c:when test="${not empty requestScope.success}">
+										<div id="alert-success" class="col-xs-offset-1 col-xs-10 alert alert-success panel-notification center" role="alert">
+											<p>${requestScope.success}<i id="close-alert-success" class="fas fa-times-circle fa-fw close-button light-grey"></i></p>
+										</div>
+									</c:when>
+								    <c:otherwise></c:otherwise>
+								</c:choose>
 								<div class="col-xs-offset-1 col-xs-10">
+									<!-- Credentials -->
 									<div class="big-marged-top">
 										<label for="showLogin"><fmt:message key="global.login" /></label>
 									</div>
 									<div>
-										<input id="showLogin" type="text" value="<%=user.getName()%>" disabled />
+										<input id="showLogin" type="text" value="${sessionScope.user.name}" disabled />
 									</div>
 									<div class="big-marged-top">
 										<label for="showPassword"><fmt:message key="global.password" /></label>
@@ -74,11 +64,32 @@
 										<label for="showEmail"><fmt:message key="global.email" /></label>
 									</div>
 									<div>
-										<input id="showEmail" class="marged-bottom" type="text" value="<%=user.getEmail()%>" disabled />
+										<input id="showEmail" class="marged-bottom" type="text" value="${sessionScope.user.email}" disabled />
 									</div>
+									<div class="big-marged-top">
+										<a class="btn btn-classic btn-sm btn-large" href="${pageContext.request.contextPath}/change"><fmt:message key="settings.update.pass" /></a>
+									</div>
+									<!-- YouTube Infos Modal -->
 									<div class="big-spaced-vertical">
-										<a class="btn btn-warning btn-xs btn-fixed" href="<%=path%>/change"><fmt:message key="settings.update.pass" /></a>
+										<a id="ytInfos" class="btn btn-classic btn-sm btn-large" data-toggle="modal" data-target=".modal-infos" data-backdrop="static"><fmt:message key="yt.global.infos.header" /> <i class="fas fa-info-circle fa-fw"></i></a>
+										<div class="modal fade modal-infos" tabindex="-1" role="dialog" aria-labelledby="modal_label_infos">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content center">
+													<div class="modal-header">
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fas fa-times fa-fw white"></i></span></button>
+														<h4 id="modal_label_infos" class="modal-title"><fmt:message key="yt.global.infos.header" /></h4>
+													</div>
+													<div class="modal-body">
+														<p><fmt:message key="yt.global.infos.msg" /></p>
+													</div>
+													<div class="modal-footer center">
+														<button type="button" class="btn btn-primary btn-sm btn-fixed" data-dismiss="modal"><fmt:message key="global.close" /></button>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
+									<!-- End YouTube Infos Modal -->
 								</div>
 							</div>
 							<div class="panel-footer"></div>
@@ -89,12 +100,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

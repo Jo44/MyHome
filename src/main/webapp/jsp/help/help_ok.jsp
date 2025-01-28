@@ -1,10 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -14,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="help.valid.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/help/help.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/help/help.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -37,7 +30,7 @@
 							<div class="panel-heading">
 								<i class="fas fa-check-circle fa-fw"></i> <fmt:message key="global.confirm" />
 								<div class="pull-right">
-									<a class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/home"><fmt:message key="global.back" /></a>
+									<a class="btn btn-primary btn-xs btn-fixed" href="${pageContext.request.contextPath}/home"><fmt:message key="global.back" /></a>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
@@ -54,12 +47,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

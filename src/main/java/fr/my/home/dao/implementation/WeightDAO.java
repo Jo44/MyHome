@@ -4,9 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -14,33 +11,31 @@ import fr.my.home.bean.Weight;
 import fr.my.home.dao.HibernateDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.tool.DatabaseAccess;
+import fr.my.home.tool.HibernateUtil;
 import fr.my.home.tool.properties.Settings;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 
 /**
- * Classe WeightDAO qui gère le stockage des poids
+ * Classe WeightDAO
  * 
  * @author Jonathan
  * @version 1.1
- * @since 15/08/2021
+ * @since 15/01/2025
  */
 public class WeightDAO implements HibernateDAO<Weight> {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private static final String WEIGHTDAO_GET_ALL_FROM_PERIOD = Settings.getStringProperty("weight.get.all.from.period");
 	private static final String WEIGHTDAO_GET_ONE = Settings.getStringProperty("weight.get.one");
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public WeightDAO() {
-		super();
-	}
-
-	// Methods
+	public WeightDAO() {}
 
 	/**
 	 * Récupère la liste de tous les poids de l'utilisateur pour la période précisée
@@ -53,14 +48,13 @@ public class WeightDAO implements HibernateDAO<Weight> {
 	 */
 	public List<Weight> getAllWeightsFromPeriod(int userId, Timestamp from, Timestamp to) throws TechnicalException {
 		List<Weight> listWeight = new ArrayList<Weight>();
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Weight> query = session.createQuery(WEIGHTDAO_GET_ALL_FROM_PERIOD);
-		query.setParameter("weight_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Weight> query = session.createQuery(WEIGHTDAO_GET_ALL_FROM_PERIOD, Weight.class);
+		query.setParameter("id_user", userId);
 		query.setParameter("from", from);
 		query.setParameter("to", to);
 		listWeight = query.getResultList();
-		DatabaseAccess.getInstance().validateSession(session);
+		HibernateUtil.getInstance().validateSession(session);
 		return listWeight;
 	}
 
@@ -75,40 +69,42 @@ public class WeightDAO implements HibernateDAO<Weight> {
 	 */
 	public Weight getOneWeight(int weightId, int userId) throws FonctionnalException, TechnicalException {
 		Weight weight = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Weight> query = session.createQuery(WEIGHTDAO_GET_ONE);
-		query.setParameter("weight_id", weightId);
-		query.setParameter("weight_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Weight> query = session.createQuery(WEIGHTDAO_GET_ONE, Weight.class);
+		query.setParameter("id", weightId);
+		query.setParameter("id_user", userId);
+		query.setMaxResults(1);
 		try {
 			weight = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le poids n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return weight;
 	}
 
 	/**
-	 * Ajoute un nouveau poids en base et renvoi son ID, ou exception fonctionnelle si impossible
+	 * Ajoute un nouveau poids, ou exception fonctionnelle si impossible
 	 * 
 	 * @param weight
-	 * @return int
 	 * @param FonctionnalException
 	 * @throws TechnicalException
 	 */
 	@Override
-	public int add(Weight weight) throws FonctionnalException, TechnicalException {
-		int id = 0;
-		Session session = DatabaseAccess.getInstance().openSession();
+	public void add(Weight weight) throws FonctionnalException, TechnicalException {
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			id = (int) session.save(weight);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.persist(weight);
+			session.flush();
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible d'ajouter le poids");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
-		return id;
 	}
 
 	/**
@@ -120,12 +116,16 @@ public class WeightDAO implements HibernateDAO<Weight> {
 	 */
 	@Override
 	public void update(Weight weight) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.saveOrUpdate(weight);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.merge(weight);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de mettre à jour le poids");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 
@@ -138,12 +138,16 @@ public class WeightDAO implements HibernateDAO<Weight> {
 	 */
 	@Override
 	public void delete(Weight weight) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.delete(weight);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.remove(weight);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de supprimer le poids");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 

@@ -2,54 +2,49 @@ package fr.my.home.servlet.help;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.my.home.bean.User;
-import fr.my.home.bean.jsp.ViewAttribut;
-import fr.my.home.bean.jsp.ViewJSP;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.global.ReCaptchaException;
 import fr.my.home.exception.help.MessageException;
 import fr.my.home.manager.HelpManager;
 import fr.my.home.tool.GlobalTools;
 import fr.my.home.tool.properties.Messages;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet qui prends en charge la gestion de la demande d'aide à l'administrateur
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @WebServlet("/help")
 public class HelpServlet extends HttpServlet {
-	private static final long serialVersionUID = 930448801449184468L;
-	private static final Logger logger = LogManager.getLogger(HelpServlet.class);
-
-	// Attributes
-
-	private HelpManager helpMgr;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final long serialVersionUID = 930448801449184468L;
+	private static final Logger logger = LogManager.getLogger(HelpServlet.class);
+	private HelpManager helpMgr;
+
+	/**
+	 * Constructeur
 	 */
 	public HelpServlet() {
 		super();
 		// Initialisation du manager
 		helpMgr = new HelpManager();
 	}
-
-	// Methods
 
 	/**
 	 * Redirection vers la page d'aide
@@ -58,16 +53,13 @@ public class HelpServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.info("--> Help Servlet [GET] -->");
 
-		// Création de la view renvoyée à la JSP
-		ViewJSP view = new ViewJSP();
-
 		// Récupère l'attribut erreur si il existe
 		String error = (String) request.getSession().getAttribute("error");
 		request.getSession().removeAttribute("error");
-		view.addAttributeToList(new ViewAttribut("error", error));
+		request.setAttribute("error", error);
 
 		// Redirection
-		redirectToHelpJSP(request, response, view);
+		redirectToHelpJSP(request, response);
 	}
 
 	/**
@@ -106,7 +98,7 @@ public class HelpServlet extends HttpServlet {
 			// En fonction de l'état de l'envoi du message
 			if (sent) {
 				// Redirection vers la JSP de confirmation
-				redirectToConfirmHelpJSP(request, response, new ViewJSP());
+				redirectToConfirmHelpJSP(request, response);
 			} else {
 				// Redirection vers la servlet en GET
 				redirectToThisServletAfterPost(request, response);
@@ -120,14 +112,10 @@ public class HelpServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void redirectToHelpJSP(HttpServletRequest request, HttpServletResponse response, ViewJSP view) throws ServletException, IOException {
-		// Charge la view dans la requête
-		request.setAttribute("view", view);
-
+	private void redirectToHelpJSP(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Redirige vers la JSP
 		logger.info(" --> Help JSP --> ");
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/help/help.jsp");
@@ -139,15 +127,10 @@ public class HelpServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void redirectToConfirmHelpJSP(HttpServletRequest request, HttpServletResponse response, ViewJSP view)
-			throws ServletException, IOException {
-		// Charge la view dans la requête
-		request.setAttribute("view", view);
-
+	private void redirectToConfirmHelpJSP(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Redirige vers la JSP
 		logger.info(" --> Confirm Help JSP --> ");
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/help/help_ok.jsp");

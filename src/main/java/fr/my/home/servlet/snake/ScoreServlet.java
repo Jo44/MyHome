@@ -7,12 +7,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,36 +17,39 @@ import fr.my.home.bean.SnakeScore;
 import fr.my.home.bean.User;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.manager.SnakeScoreManager;
+import fr.my.home.manager.SnakeManager;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet qui prends en charge les requêtes AJAX pour enregistrer / récupérer les scores de Snake
  * 
  * @author Jonathan
- * @version 1.0
- * @since 31/12/2024
+ * @version 1.1
+ * @since 15/01/2025
  */
 @WebServlet("/snake_score")
 public class ScoreServlet extends HttpServlet {
-	private static final long serialVersionUID = 930448801449184468L;
-	private static final Logger logger = LogManager.getLogger(ScoreServlet.class);
-
-	// Attributes
-
-	private SnakeScoreManager scoreMgr;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final long serialVersionUID = 930448801449184468L;
+	private static final Logger logger = LogManager.getLogger(ScoreServlet.class);
+	private SnakeManager scoreMgr;
+
+	/**
+	 * Constructeur
 	 */
 	public ScoreServlet() {
 		super();
 		// Initialisation du manager
-		scoreMgr = new SnakeScoreManager();
+		scoreMgr = new SnakeManager();
 	}
-
-	// Methods
 
 	/**
 	 * Retourne les scores PB et WR en JSON

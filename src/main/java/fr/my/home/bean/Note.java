@@ -1,131 +1,89 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean Note que peut enregistrer un utilisateur
+ * Bean Note
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "note")
-public class Note implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private int idUser;
-	private String title;
-	private String message;
-	private Timestamp saveDate;
-
-	// Constructors
+@Table(name = "notes")
+public class Note {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public Note() {
-		super();
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param idUser
-	 * @param title
-	 * @param message
-	 * @param saveDate
-	 */
-	public Note(int idUser, String title, String message, Timestamp saveDate) {
-		this();
-		this.idUser = idUser;
-		this.title = title;
-		this.message = message;
-		this.saveDate = saveDate;
-	}
-
-	// Methods
-
-	/**
-	 * To String
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , User: ");
-		sb.append(String.valueOf(idUser));
-		sb.append(" , Title: ");
-		if (title != null) {
-			sb.append(title);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Message: ");
-		if (message != null) {
-			sb.append(message);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Save Date: ");
-		if (saveDate != null) {
-			sb.append(saveDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
 
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "note_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "id_user", nullable = false)
+	private int id_user;
+	@Column(name = "title", nullable = false)
+	private String title;
+	@Column(name = "message", nullable = false)
+	private String message;
+	@Column(name = "save_date", nullable = false)
+	private Timestamp save_date;
+
+	/**
+	 * Constructeur
+	 */
+	public Note() {}
+
+	/**
+	 * Constructeur
+	 * 
+	 * @param id_user
+	 * @param title
+	 * @param message
+	 * @param save_date
+	 */
+	public Note(int id_user, String title, String message, Timestamp save_date) {
+		this.id_user = id_user;
+		this.title = title;
+		this.message = message;
+		this.save_date = save_date;
+	}
+
+	/**
+	 * Getters/Setters
+	 */
+
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "note_id_user")
 	public int getIdUser() {
-		return idUser;
+		return id_user;
 	}
 
-	@SuppressWarnings("unused")
-	private void setIdUser(int idUser) {
-		this.idUser = idUser;
+	public void setIdUser(int id_user) {
+		this.id_user = id_user;
 	}
 
-	@Column(name = "note_title")
 	public String getTitle() {
 		return title;
 	}
 
-	@SuppressWarnings("unused")
-	private void setTitle(String title) {
+	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	@Column(name = "note_message")
 	public String getMessage() {
 		return message;
 	}
@@ -134,14 +92,12 @@ public class Note implements Serializable {
 		this.message = message;
 	}
 
-	@Column(name = "note_save_date")
 	public Timestamp getSaveDate() {
-		return saveDate;
+		return save_date;
 	}
 
-	@SuppressWarnings("unused")
-	private void setSaveDate(Timestamp saveDate) {
-		this.saveDate = saveDate;
+	public void setSaveDate(Timestamp save_date) {
+		this.save_date = save_date;
 	}
 
 }

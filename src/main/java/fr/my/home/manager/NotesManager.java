@@ -19,33 +19,30 @@ import fr.my.home.exception.notes.CantDeleteException;
 import fr.my.home.exception.notes.DateHourException;
 import fr.my.home.exception.notes.NotExistException;
 import fr.my.home.exception.notes.TitleException;
-import fr.my.home.exception.notes.UsedTitleException;
 
 /**
  * Manager qui prends en charge la gestion des notes
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class NotesManager {
-	private static final Logger logger = LogManager.getLogger(NotesManager.class);
-
-	// Attributes
-
-	private NoteDAO noteDAO;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final Logger logger = LogManager.getLogger(NotesManager.class);
+	private NoteDAO noteDAO;
+
+	/**
+	 * Constructeur
 	 */
 	public NotesManager() {
 		super();
 		noteDAO = new NoteDAO();
 	}
-
-	// Methods
 
 	/**
 	 * Récupère la liste des notes pour l'utilisateur connecté
@@ -111,7 +108,6 @@ public class NotesManager {
 	public void addNote(int userId, Timestamp dateTime, String title, String message) throws FonctionnalException, TechnicalException {
 		// Vérifie si les champs sont bien tous valides
 		checkParamsNote(dateTime, title);
-
 		try {
 			// Ajout de la nouvelle note
 			Note note = new Note(userId, title.trim(), message.trim(), dateTime);
@@ -119,7 +115,7 @@ public class NotesManager {
 			logger.debug("Ajout d'une nouvelle note réussi");
 		} catch (FonctionnalException fex) {
 			logger.debug(fex.getMessage());
-			throw new UsedTitleException("Titre déjà existant");
+			throw fex;
 		} catch (TechnicalException tex) {
 			logger.error(tex.getMessage());
 			throw tex;
@@ -127,7 +123,7 @@ public class NotesManager {
 	}
 
 	/**
-	 * Supprime la note ou message d'erreur dans la view si besoin
+	 * Supprime la note ou exception fonctionnelle si problème
 	 * 
 	 * @param note
 	 * @throws FonctionnalException

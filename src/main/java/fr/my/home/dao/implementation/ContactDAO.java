@@ -3,9 +3,6 @@ package fr.my.home.dao.implementation;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -13,33 +10,31 @@ import fr.my.home.bean.Contact;
 import fr.my.home.dao.HibernateDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.tool.DatabaseAccess;
+import fr.my.home.tool.HibernateUtil;
 import fr.my.home.tool.properties.Settings;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 
 /**
- * Classe ContactDAO qui gère le stockage des contacts
+ * Classe ContactDAO
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class ContactDAO implements HibernateDAO<Contact> {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private static final String CONTACTDAO_GET_ALL = Settings.getStringProperty("contact.get.all");
 	private static final String CONTACTDAO_GET_ONE = Settings.getStringProperty("contact.get.one");
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public ContactDAO() {
-		super();
-	}
-
-	// Methods
+	public ContactDAO() {}
 
 	/**
 	 * Récupère la liste de tous les contacts de l'utilisateur
@@ -50,12 +45,11 @@ public class ContactDAO implements HibernateDAO<Contact> {
 	 */
 	public List<Contact> getAllContacts(int userId) throws TechnicalException {
 		List<Contact> listContact = new ArrayList<Contact>();
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Contact> query = session.createQuery(CONTACTDAO_GET_ALL);
-		query.setParameter("contact_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Contact> query = session.createQuery(CONTACTDAO_GET_ALL, Contact.class);
+		query.setParameter("id_user", userId);
 		listContact = query.getResultList();
-		DatabaseAccess.getInstance().validateSession(session);
+		HibernateUtil.getInstance().validateSession(session);
 		return listContact;
 	}
 
@@ -70,40 +64,42 @@ public class ContactDAO implements HibernateDAO<Contact> {
 	 */
 	public Contact getOneContact(int contactId, int userId) throws FonctionnalException, TechnicalException {
 		Contact contact = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Contact> query = session.createQuery(CONTACTDAO_GET_ONE);
-		query.setParameter("contact_id", contactId);
-		query.setParameter("contact_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Contact> query = session.createQuery(CONTACTDAO_GET_ONE, Contact.class);
+		query.setParameter("id", contactId);
+		query.setParameter("id_user", userId);
+		query.setMaxResults(1);
 		try {
 			contact = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le contact n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return contact;
 	}
 
 	/**
-	 * Ajoute un nouveau contact en base et renvoi son ID, ou exception fonctionnelle si impossible
+	 * Ajoute un nouveau contact, ou exception fonctionnelle si impossible
 	 * 
 	 * @param contact
-	 * @return int
 	 * @throws FonctionnalException
 	 * @throws TechnicalException
 	 */
 	@Override
-	public int add(Contact contact) throws FonctionnalException, TechnicalException {
-		int id = 0;
-		Session session = DatabaseAccess.getInstance().openSession();
+	public void add(Contact contact) throws FonctionnalException, TechnicalException {
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			id = (int) session.save(contact);
-			DatabaseAccess.getInstance().validateSession(session);
-		} catch (PersistenceException pe) {
+			session.persist(contact);
+			session.flush();
+			HibernateUtil.getInstance().validateSession(session);
+		} catch (PersistenceException pex) {
 			throw new FonctionnalException("Impossible d'ajouter le contact");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
-		return id;
 	}
 
 	/**
@@ -115,12 +111,16 @@ public class ContactDAO implements HibernateDAO<Contact> {
 	 */
 	@Override
 	public void update(Contact contact) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.saveOrUpdate(contact);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.merge(contact);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de mettre à jour le contact");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 
@@ -133,12 +133,16 @@ public class ContactDAO implements HibernateDAO<Contact> {
 	 */
 	@Override
 	public void delete(Contact contact) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.delete(contact);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.remove(contact);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de supprimer le contact");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 

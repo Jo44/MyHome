@@ -1,148 +1,93 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean Contact que peut enregistrer un utilisateur
+ * Bean Contact
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "contact")
-public class Contact implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private int idUser;
-	private String firstname;
-	private String lastname;
-	private String email;
-	private String phone;
-	private String twitter;
-	private Timestamp saveDate;
-
-	// Constructors
+@Table(name = "contacts")
+public class Contact {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public Contact() {
-		super();
-	}
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "id_user", nullable = false)
+	private int id_user;
+	@Column(name = "firstname", nullable = false)
+	private String firstname;
+	@Column(name = "lastname", nullable = true)
+	private String lastname;
+	@Column(name = "email", nullable = true)
+	private String email;
+	@Column(name = "phone", nullable = true)
+	private String phone;
+	@Column(name = "twitter", nullable = true)
+	private String twitter;
+	@Column(name = "save_date", nullable = false)
+	private Timestamp save_date;
 
 	/**
-	 * Constructor
+	 * Constructeur
+	 */
+	public Contact() {}
+
+	/**
+	 * Constructeur
 	 * 
-	 * @param idUser
+	 * @param id_user
 	 * @param firstname
 	 * @param lastname
 	 * @param email
 	 * @param phone
 	 * @param twitter
-	 * @param saveDate
+	 * @param save_date
 	 */
-	public Contact(int idUser, String firstname, String lastname, String email, String phone, String twitter, Timestamp saveDate) {
-		this();
-		this.idUser = idUser;
+	public Contact(int id_user, String firstname, String lastname, String email, String phone, String twitter, Timestamp save_date) {
+		this.id_user = id_user;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
 		this.phone = phone;
 		this.twitter = twitter;
-		this.saveDate = saveDate;
+		this.save_date = save_date;
 	}
-
-	// Methods
 
 	/**
-	 * To String
+	 * Getters/Setters
 	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , User: ");
-		sb.append(String.valueOf(idUser));
-		sb.append(" , Firstname: ");
-		if (firstname != null) {
-			sb.append(firstname);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Lastname: ");
-		if (lastname != null) {
-			sb.append(lastname);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Email: ");
-		if (email != null) {
-			sb.append(email);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Phone: ");
-		if (phone != null) {
-			sb.append(phone);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Twitter: ");
-		if (twitter != null) {
-			sb.append(twitter);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Save Date: ");
-		if (saveDate != null) {
-			sb.append(saveDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
 
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
-
-	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "contact_id")
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "contact_id_user")
 	public int getIdUser() {
-		return idUser;
+		return id_user;
 	}
 
-	@SuppressWarnings("unused")
-	private void setIdUser(int idUser) {
-		this.idUser = idUser;
+	public void setIdUser(int id_user) {
+		this.id_user = id_user;
 	}
 
-	@Column(name = "contact_firstname")
 	public String getFirstname() {
 		return firstname;
 	}
@@ -151,7 +96,6 @@ public class Contact implements Serializable {
 		this.firstname = firstname;
 	}
 
-	@Column(name = "contact_lastname")
 	public String getLastname() {
 		return lastname;
 	}
@@ -160,7 +104,6 @@ public class Contact implements Serializable {
 		this.lastname = lastname;
 	}
 
-	@Column(name = "contact_email")
 	public String getEmail() {
 		return email;
 	}
@@ -169,7 +112,6 @@ public class Contact implements Serializable {
 		this.email = email;
 	}
 
-	@Column(name = "contact_phone")
 	public String getPhone() {
 		return phone;
 	}
@@ -178,7 +120,6 @@ public class Contact implements Serializable {
 		this.phone = phone;
 	}
 
-	@Column(name = "contact_twitter")
 	public String getTwitter() {
 		return twitter;
 	}
@@ -187,14 +128,12 @@ public class Contact implements Serializable {
 		this.twitter = twitter;
 	}
 
-	@Column(name = "contact_save_date")
 	public Timestamp getSaveDate() {
-		return saveDate;
+		return save_date;
 	}
 
-	@SuppressWarnings("unused")
-	private void setSaveDate(Timestamp saveDate) {
-		this.saveDate = saveDate;
+	public void setSaveDate(Timestamp save_date) {
+		this.save_date = save_date;
 	}
 
 }

@@ -21,27 +21,25 @@ import fr.my.home.exception.health.sports.NotExistException;
  * Manager qui prends en charge la gestion des activités sportives
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class SportsManager {
-	private static final Logger logger = LogManager.getLogger(SportsManager.class);
-
-	// Attributes
-
-	private SportDAO sportDAO;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final Logger logger = LogManager.getLogger(SportsManager.class);
+	private SportDAO sportDAO;
+
+	/**
+	 * Constructeur
 	 */
 	public SportsManager() {
 		super();
 		sportDAO = new SportDAO();
 	}
-
-	// Methods
 
 	/**
 	 * Récupère la liste des activités sportives pour l'utilisateur connecté pour la période précisée
@@ -117,7 +115,7 @@ public class SportsManager {
 	}
 
 	/**
-	 * Supprime l'activité sportive ou message d'erreur dans la view si besoin
+	 * Supprime l'activité sportive ou exception fonctionnelle si problème
 	 * 
 	 * @param sport
 	 * @throws FonctionnalException

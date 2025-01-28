@@ -1,170 +1,110 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean User qui stocke les utilisateurs de l'application
+ * Bean User
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "user")
-public class User implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private String name;
-	private String pass;
-	private String email;
-	private String rememberMeToken;
-	private String validationToken;
-	private boolean active;
-	private String reInitToken;
-	private Timestamp reInitDate;
-	private Timestamp lastLogDate;
-	private Timestamp inscriptionDate;
-
-	// Constructors
+@Table(name = "users")
+public class User {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public User() {
-		super();
-	}
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "name", nullable = false, unique = true)
+	private String name;
+	@Column(name = "pass", nullable = false)
+	private String pass;
+	@Column(name = "email", nullable = false, unique = true)
+	private String email;
+	@Column(name = "remember_me_token", nullable = true)
+	private String remember_me_token;
+	@Column(name = "validation_token", nullable = false)
+	private String validation_token;
+	@Column(name = "active", nullable = false)
+	private boolean active;
+	@Column(name = "reinit_token", nullable = true)
+	private String reinit_token;
+	@Column(name = "reinit_date", nullable = true)
+	private Timestamp reinit_date;
+	@Column(name = "access_token", nullable = true)
+	private String access_token;
+	@Column(name = "last_log_date", nullable = true)
+	private Timestamp last_log_date;
+	@Column(name = "inscription_date", nullable = false)
+	private Timestamp inscription_date;
 
 	/**
-	 * Constructor
+	 * Constructeur
+	 */
+	public User() {}
+
+	/**
+	 * Constructeur
 	 * 
 	 * @param name
 	 * @param pass
 	 * @param email
-	 * @param rememberMeToken
-	 * @param validationToken
+	 * @param remember_me_token
+	 * @param validation_token
 	 * @param active
-	 * @param reInitToken
-	 * @param reInitDate
-	 * @param lastLogDate
-	 * @param inscriptionDate
+	 * @param reinit_token
+	 * @param reinit_date
+	 * @param access_token
+	 * @param last_log_date
+	 * @param inscription_date
 	 */
-	public User(String name, String pass, String email, String rememberMeToken, String validationToken, boolean active, String reInitToken,
-			Timestamp reInitDate, Timestamp lastLogDate, Timestamp inscriptionDate) {
-		this();
+	public User(String name, String pass, String email, String remember_me_token, String validation_token, boolean active, String reinit_token,
+			Timestamp reinit_date, String access_token, Timestamp last_log_date, Timestamp inscription_date) {
 		this.name = name;
 		this.pass = pass;
 		this.email = email;
-		this.rememberMeToken = rememberMeToken;
-		this.validationToken = validationToken;
+		this.remember_me_token = remember_me_token;
+		this.validation_token = validation_token;
 		this.active = active;
-		this.reInitToken = reInitToken;
-		this.reInitDate = reInitDate;
-		this.lastLogDate = lastLogDate;
-		this.inscriptionDate = inscriptionDate;
+		this.reinit_token = reinit_token;
+		this.reinit_date = reinit_date;
+		this.access_token = access_token;
+		this.last_log_date = last_log_date;
+		this.inscription_date = inscription_date;
 	}
-
-	// Methods
 
 	/**
-	 * To String
+	 * Getters/Setters
 	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , Name: ");
-		if (name != null) {
-			sb.append(name.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Email: ");
-		if (email != null) {
-			sb.append(email.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , RememberMe Token: ");
-		if (rememberMeToken != null) {
-			sb.append(rememberMeToken.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Validation Token: ");
-		if (validationToken != null) {
-			sb.append(validationToken.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Active: ");
-		sb.append(String.valueOf(active));
-		sb.append(" , ReInit Token: ");
-		if (reInitToken != null) {
-			sb.append(reInitToken.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , ReInit Date: ");
-		if (reInitDate != null) {
-			sb.append(reInitDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Last Log Date: ");
-		if (reInitDate != null) {
-			sb.append(lastLogDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Inscription Date: ");
-		if (inscriptionDate != null) {
-			sb.append(inscriptionDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
 
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
-
-	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "user_id")
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "user_name")
 	public String getName() {
 		return name;
 	}
 
-	@SuppressWarnings("unused")
-	private void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	@Column(name = "user_pass")
 	public String getPass() {
 		return pass;
 	}
@@ -173,36 +113,30 @@ public class User implements Serializable {
 		this.pass = pass;
 	}
 
-	@Column(name = "user_email")
 	public String getEmail() {
 		return email;
 	}
 
-	@SuppressWarnings("unused")
-	private void setEmail(String email) {
+	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	@Column(name = "user_remember_me_token")
-	private String getRememberMeToken() {
-		return rememberMeToken;
+	public String getRememberMeToken() {
+		return remember_me_token;
 	}
 
-	public void setRememberMeToken(String rememberMeToken) {
-		this.rememberMeToken = rememberMeToken;
+	public void setRememberMeToken(String remember_me_token) {
+		this.remember_me_token = remember_me_token;
 	}
 
-	@Column(name = "user_validation_token")
 	public String getValidationToken() {
-		return validationToken;
+		return validation_token;
 	}
 
-	@SuppressWarnings("unused")
-	private void setValidationToken(String validationToken) {
-		this.validationToken = validationToken;
+	public void setValidationToken(String validation_token) {
+		this.validation_token = validation_token;
 	}
 
-	@Column(name = "user_active")
 	public boolean isActive() {
 		return active;
 	}
@@ -211,41 +145,44 @@ public class User implements Serializable {
 		this.active = active;
 	}
 
-	@Column(name = "user_reinit_token")
 	public String getReInitToken() {
-		return reInitToken;
+		return reinit_token;
 	}
 
-	public void setReInitToken(String reInitToken) {
-		this.reInitToken = reInitToken;
+	public void setReInitToken(String reinit_token) {
+		this.reinit_token = reinit_token;
 	}
 
-	@Column(name = "user_reinit_date")
 	public Timestamp getReInitDate() {
-		return reInitDate;
+		return reinit_date;
 	}
 
-	public void setReInitDate(Timestamp reInitDate) {
-		this.reInitDate = reInitDate;
+	public void setReInitDate(Timestamp reinit_date) {
+		this.reinit_date = reinit_date;
 	}
 
-	@Column(name = "user_last_log_date")
+	public String getAccessToken() {
+		return access_token;
+	}
+
+	public void setAccessToken(String access_token) {
+		this.access_token = access_token;
+	}
+
 	public Timestamp getLastLogDate() {
-		return lastLogDate;
+		return last_log_date;
 	}
 
-	public void setLastLogDate(Timestamp lastLogDate) {
-		this.lastLogDate = lastLogDate;
+	public void setLastLogDate(Timestamp last_log_date) {
+		this.last_log_date = last_log_date;
 	}
 
-	@Column(name = "user_inscription_date")
 	public Timestamp getInscriptionDate() {
-		return inscriptionDate;
+		return inscription_date;
 	}
 
-	@SuppressWarnings("unused")
-	private void setInscriptionDate(Timestamp inscriptionDate) {
-		this.inscriptionDate = inscriptionDate;
+	public void setInscriptionDate(Timestamp inscription_date) {
+		this.inscription_date = inscription_date;
 	}
 
 }

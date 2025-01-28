@@ -93,7 +93,7 @@ function updatePeriod() {
 	}
 	
 	// Redirect
-	var url = '/health/weights?action=list&from=';
+	var url = path + '/health/weights?action=list&from=';
 	url += dateFrom;
 	url += '&to=';
 	url += dateTo;

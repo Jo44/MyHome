@@ -17,8 +17,6 @@ var timer;
 // Charge le lecteur YouTube
 function onYouTubeIframeAPIReady() {
 	player = new YT.Player('player', {
-		height: '700',
-		width: '100%',
 		events: {
 			'onReady': onPlayerReady,
 			'onStateChange': onPlayerStateChange,
@@ -37,11 +35,11 @@ function onYouTubeIframeAPIReady() {
 // Lorsque le lecteur est charge
 function onPlayerReady(event) {
 	// Initialisation
-	initialize(event);
+	initialize();
 }
 
 // Initialisation
-function initialize(event) {
+function initialize() {
 	// Prepare la liste des videos
 	initPlayedVideos();
 	// Charge le lecteur
@@ -60,7 +58,7 @@ function initPlayedVideos() {
 
 // Charge la video dans le lecteur
 function loadPlayer() {
-	if (playedVideos.length > 0) {
+	if (player && playedVideos.length > 0) {
 		// Lance la video
 		player.loadVideoById(playedVideos[currentIndex][0]);
 		// Cache le contenu No Valid Video
@@ -374,6 +372,8 @@ $('#fullscreenVid').on('click', function() {
 
 // Au chargement
 $(document).ready(function() {
+	// Charge le lecteur YouTube
+	onYouTubeIframeAPIReady();
 	if (videos.length > 0) {
 		$('#selectVideo').show();
 		$('#selectPlaylist').show();

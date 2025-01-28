@@ -22,21 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe SportDAOTest qui teste le stockage des poids
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class WeightDAOTest {
 
-	// Attributs
-	private WeightDAO weightDAO;
-	private Timestamp now;
-	private Timestamp previousDay;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private WeightDAO weightDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public WeightDAOTest() {
 		super();
 		weightDAO = new WeightDAO();
-		now = Timestamp.valueOf(LocalDateTime.now());
-		previousDay = Timestamp.valueOf(LocalDateTime.now().minusMonths(3L));
 	}
 
 	/**
@@ -58,7 +59,8 @@ public class WeightDAOTest {
 	public void getAllWeightsFromPeriodOk() {
 		List<Weight> listWeight = null;
 		try {
-			listWeight = weightDAO.getAllWeightsFromPeriod(0, previousDay, now);
+			listWeight = weightDAO.getAllWeightsFromPeriod(0, Timestamp.valueOf(LocalDateTime.now().minusMonths(3L)),
+					Timestamp.valueOf(LocalDateTime.now()));
 		} catch (TechnicalException ex) {
 			listWeight = null;
 		}
@@ -70,7 +72,7 @@ public class WeightDAOTest {
 	 */
 	@Test
 	public void getOneWeightOk() {
-		Weight weight = new Weight(1, 0, now);
+		Weight weight = new Weight(1, 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			weightDAO.add(weight);
 			weight = weightDAO.getOneWeight(weight.getId(), 1);
@@ -100,23 +102,21 @@ public class WeightDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		Weight weight = null;
+		boolean valid = false;
+		Weight weight = new Weight(1, 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			weight = new Weight(1, 0, now);
-			id = weightDAO.add(weight);
+			weightDAO.add(weight);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					weightDAO.delete(weight);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				weightDAO.delete(weight);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -124,14 +124,19 @@ public class WeightDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		Weight weight = new Weight(1, 0, null);
 		try {
-			Weight weight = new Weight(1, 0, null);
-			id = weightDAO.add(weight);
+			weightDAO.add(weight);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				weightDAO.delete(weight);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -140,23 +145,20 @@ public class WeightDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-
-		Weight weight = new Weight(1, 0, now);
+		Weight weight = new Weight(1, 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = weightDAO.add(weight);
+			weightDAO.add(weight);
 			try {
-				weight.setSaveDate(previousDay);
+				weight.setSaveDate(Timestamp.valueOf(LocalDateTime.now().minusMonths(3L)));
 				weightDAO.update(weight);
 				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						weightDAO.delete(weight);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					weightDAO.delete(weight);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -171,21 +173,22 @@ public class WeightDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		Weight weight = new Weight(1, 0, now);
+		Timestamp ts = Timestamp.valueOf(LocalDateTime.now());
+		Weight weight = new Weight(1, 0, ts);
 		try {
-			int id = weightDAO.add(weight);
+			weightDAO.add(weight);
 			try {
 				weight.setSaveDate(null);
 				weightDAO.update(weight);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						weightDAO.delete(weight);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					weight.setSaveDate(ts);
+					weightDAO.delete(weight);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -200,7 +203,7 @@ public class WeightDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		Weight weight = new Weight(1, 0, now);
+		Weight weight = new Weight(1, 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			weightDAO.add(weight);
 			weightDAO.delete(weight);

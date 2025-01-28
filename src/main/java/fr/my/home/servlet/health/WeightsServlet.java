@@ -2,23 +2,17 @@ package fr.my.home.servlet.health;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.my.home.bean.User;
 import fr.my.home.bean.Weight;
-import fr.my.home.bean.jsp.ViewAttribut;
-import fr.my.home.bean.jsp.ViewJSP;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
 import fr.my.home.exception.health.weights.CantDeleteException;
@@ -28,35 +22,39 @@ import fr.my.home.exception.health.weights.NotExistException;
 import fr.my.home.manager.WeightManager;
 import fr.my.home.tool.GlobalTools;
 import fr.my.home.tool.properties.Messages;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet qui prends en charge la gestion du poids
  * 
  * @author Jonathan
  * @version 1.1
- * @since 15/08/2021
+ * @since 15/01/2025
  */
 @WebServlet("/health/weights")
 public class WeightsServlet extends HttpServlet {
-	private static final long serialVersionUID = 930448801449184468L;
-	private static final Logger logger = LogManager.getLogger(WeightsServlet.class);
-
-	// Attributes
-
-	private WeightManager weightMgr;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final long serialVersionUID = 930448801449184468L;
+	private static final Logger logger = LogManager.getLogger(WeightsServlet.class);
+	private WeightManager weightMgr;
+
+	/**
+	 * Constructeur
 	 */
 	public WeightsServlet() {
 		super();
 		// Initialisation du manager
 		weightMgr = new WeightManager();
 	}
-
-	// Methods
 
 	/**
 	 * Redirection vers la liste et la suppression des poids
@@ -65,18 +63,15 @@ public class WeightsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.info("--> Weight Servlet [GET] -->");
 
-		// Création de la view renvoyée à la JSP
-		ViewJSP view = new ViewJSP();
-
 		// Récupère l'attribut erreur si il existe
 		String error = (String) request.getSession().getAttribute("error");
 		request.getSession().removeAttribute("error");
-		view.addAttributeToList(new ViewAttribut("error", error));
+		request.setAttribute("error", error);
 
 		// Récupère l'attribut success si il existe
 		String success = (String) request.getSession().getAttribute("success");
 		request.getSession().removeAttribute("success");
-		view.addAttributeToList(new ViewAttribut("success", success));
+		request.setAttribute("success", success);
 
 		// Récupère l'ID de l'utilisateur en session
 		int userId = ((User) request.getSession().getAttribute("user")).getId();
@@ -86,12 +81,12 @@ public class WeightsServlet extends HttpServlet {
 
 		// Récupère le nombre de lignes max d'un tableau à afficher (pour traitement javascript)
 		int maxRows = GlobalTools.getMaxRows(request);
-		view.addAttributeToList(new ViewAttribut("maxRows", maxRows));
+		request.setAttribute("maxRows", maxRows);
 
-		// Récupère la date / heure actuelle en string et la charge dans la view
+		// Récupère la date / heure actuelle en string et la charge dans la requête
 		LocalDateTime now = LocalDateTime.now();
 		String today = GlobalTools.formatDateToString(now);
-		view.addAttributeToList(new ViewAttribut("today", today));
+		request.setAttribute("today", today);
 
 		// Récupère les paramètres de la requête
 		String action = request.getParameter("action");
@@ -102,22 +97,13 @@ public class WeightsServlet extends HttpServlet {
 		} catch (NumberFormatException e) {
 			weightId = 0;
 		}
-		// Récupère les dates de la période voulue et les charge dans la view
-		Timestamp from = Timestamp.valueOf(now);
-		Timestamp to = Timestamp.valueOf(now);
-		try {
-			from.setTime(Long.parseLong(request.getParameter("from")));
+		// Récupère les dates de la période voulue et les charge dans la requête
+		Timestamp from = GlobalTools.getFrom(request.getParameter("from"), 24L);
+		Timestamp to = GlobalTools.getTo(request.getParameter("to"));
+		request.setAttribute("from", GlobalTools.formatDateToString(from.toLocalDateTime()));
+		request.setAttribute("to", GlobalTools.formatDateToString(to.toLocalDateTime()));
 
-		} catch (NumberFormatException nfe) {
-			from = Timestamp.valueOf(now.minusYears(2L));
-		}
-		try {
-			to.setTime(Long.parseLong(request.getParameter("to")));
-		} catch (NumberFormatException nfe) {
-			to = Timestamp.valueOf(now);
-		}
-		view.addAttributeToList(new ViewAttribut("from", GlobalTools.formatDateToString(from.toLocalDateTime())));
-		view.addAttributeToList(new ViewAttribut("to", GlobalTools.formatDateToString(to.toLocalDateTime())));
+		// Récupère l'ordre de tri et le sens
 		String orderBy = request.getParameter("order-by");
 		String dir = request.getParameter("dir");
 
@@ -136,18 +122,18 @@ public class WeightsServlet extends HttpServlet {
 				// Si action lister
 				case "list":
 					// Renvoi à la liste des poids
-					redirectToWeightsList(request, response, view, userId, from, to, orderBy, dir, lang);
+					redirectToWeightsList(request, response, userId, from, to, orderBy, dir, lang);
 					break;
 				// Si action non reconnu
 				default:
 					// Renvoi à la liste des poids
-					redirectToWeightsList(request, response, view, userId, from, to, null, null, lang);
+					redirectToWeightsList(request, response, userId, from, to, null, null, lang);
 					break;
 			}
 		} else {
 			// Si paramètre action non renseigné
 			// Renvoi à la liste des poids
-			redirectToWeightsList(request, response, view, userId, from, to, null, null, lang);
+			redirectToWeightsList(request, response, userId, from, to, null, null, lang);
 		}
 	}
 
@@ -206,7 +192,7 @@ public class WeightsServlet extends HttpServlet {
 			// Supprime le poids
 			weightMgr.deleteWeight(weight);
 
-			// Ajoute le message de succès dans la view
+			// Ajoute le message de succès dans la requête
 			request.getSession().setAttribute("success", Messages.getProperty("success.weight.delete", lang));
 		} catch (FonctionnalException fex) {
 			if (fex instanceof NotExistException) {
@@ -224,7 +210,6 @@ public class WeightsServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @param userId
 	 * @param from
 	 * @param to
@@ -234,8 +219,8 @@ public class WeightsServlet extends HttpServlet {
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	private void redirectToWeightsList(HttpServletRequest request, HttpServletResponse response, ViewJSP view, int userId, Timestamp from,
-			Timestamp to, String orderBy, String dir, String lang) throws ServletException, IOException {
+	private void redirectToWeightsList(HttpServletRequest request, HttpServletResponse response, int userId, Timestamp from, Timestamp to,
+			String orderBy, String dir, String lang) throws ServletException, IOException {
 		List<Weight> listWeight = null;
 		try {
 			// Récupère la liste des poids de l'utilisateur
@@ -245,12 +230,17 @@ public class WeightsServlet extends HttpServlet {
 			listWeight = weightMgr.orderBy(listWeight, orderBy, dir);
 
 		} catch (TechnicalException tex) {
-			view.addAttributeToList(new ViewAttribut("error", Messages.getProperty("error.database", lang)));
+			request.setAttribute("error", Messages.getProperty("error.database", lang));
 		}
-		// Ajoute la liste dans la view
-		view.addAttributeToList(new ViewAttribut("listWeight", listWeight));
+		// Prépare la liste inversée pour le graphique JS
+		List<Weight> jsListWeight = new ArrayList<Weight>(listWeight);
+		Collections.reverse(jsListWeight);
+		// Ajoute les attributs à la requête
+		request.setAttribute("listWeight", listWeight);
+		request.setAttribute("jsListWeight", jsListWeight);
+		request.setAttribute("formatterDate", new SimpleDateFormat("dd/MM/yyyy - HH:mm"));
 		// Redirection
-		redirectToWeightJSP(request, response, view);
+		redirectToWeightJSP(request, response);
 	}
 
 	/**
@@ -258,17 +248,13 @@ public class WeightsServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void redirectToWeightJSP(HttpServletRequest request, HttpServletResponse response, ViewJSP view) throws ServletException, IOException {
-		// Charge la view dans la requête
-		request.setAttribute("view", view);
-
+	private void redirectToWeightJSP(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Redirige vers la JSP
 		logger.info(" --> Weight JSP --> ");
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/health/weight/weight.jsp");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/health/weights.jsp");
 		dispatcher.forward(request, response);
 	}
 

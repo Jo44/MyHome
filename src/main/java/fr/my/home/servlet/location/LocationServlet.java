@@ -2,52 +2,47 @@ package fr.my.home.servlet.location;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.my.home.bean.api.ObjectIPAPI;
-import fr.my.home.bean.jsp.ViewAttribut;
-import fr.my.home.bean.jsp.ViewJSP;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.manager.LocationManager;
 import fr.my.home.tool.GlobalTools;
 import fr.my.home.tool.properties.Messages;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet qui prends en charge la gestion de la localisation d'une IP ou nom de domaine
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @WebServlet("/location")
 public class LocationServlet extends HttpServlet {
-	private static final long serialVersionUID = 930448801449184468L;
-	private static final Logger logger = LogManager.getLogger(LocationServlet.class);
-
-	// Attributes
-
-	private LocationManager locMgr;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final long serialVersionUID = 930448801449184468L;
+	private static final Logger logger = LogManager.getLogger(LocationServlet.class);
+	private LocationManager locMgr;
+
+	/**
+	 * Constructeur
 	 */
 	public LocationServlet() {
 		super();
 		// Initialisation du manager
 		locMgr = new LocationManager();
 	}
-
-	// Methods
 
 	/**
 	 * Redirection vers la page de localisation
@@ -56,26 +51,23 @@ public class LocationServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.info("--> Location Servlet [GET] -->");
 
-		// Création de la view renvoyée à la JSP
-		ViewJSP view = new ViewJSP();
-
 		// Récupère l'attribut erreur si il existe
 		String error = (String) request.getSession().getAttribute("error");
 		request.getSession().removeAttribute("error");
-		view.addAttributeToList(new ViewAttribut("error", error));
+		request.setAttribute("error", error);
 
 		// Récupère la recherche si elle existe
 		String search = (String) request.getSession().getAttribute("search");
 		request.getSession().removeAttribute("search");
-		view.addAttributeToList(new ViewAttribut("search", search));
+		request.setAttribute("search", search);
 
 		// Récupère l'objet IPAPI si il existe
 		ObjectIPAPI objectIPAPI = (ObjectIPAPI) request.getSession().getAttribute("objectIPAPI");
 		request.getSession().removeAttribute("objectIPAPI");
-		view.addAttributeToList(new ViewAttribut("objectIPAPI", objectIPAPI));
+		request.setAttribute("objectIPAPI", objectIPAPI);
 
 		// Redirection
-		redirectToLocationJSP(request, response, view);
+		redirectToLocationJSP(request, response);
 	}
 
 	/**
@@ -119,14 +111,10 @@ public class LocationServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void redirectToLocationJSP(HttpServletRequest request, HttpServletResponse response, ViewJSP view) throws ServletException, IOException {
-		// Charge la view dans la requête
-		request.setAttribute("view", view);
-
+	private void redirectToLocationJSP(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Redirige vers la JSP
 		logger.info(" --> Location JSP --> ");
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/location/location.jsp");

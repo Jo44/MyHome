@@ -4,10 +4,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,33 +26,34 @@ import fr.my.home.exception.users.UsedLoginException;
 import fr.my.home.tool.GlobalTools;
 import fr.my.home.tool.properties.EmailMessages;
 import fr.my.home.tool.properties.Settings;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Manager qui prends en charge la gestion des utilisateurs
  * 
  * @author Jonathan
  * @version 1.1
- * @since 07/08/2021
+ * @since 15/01/2025
  */
 public class UsersManager {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(UsersManager.class);
-
-	// Attributes
-
 	private static final String COOKIE_NAME = Settings.getStringProperty("cookie.name");
 	private UserDAO userDAO;
 
-	// Constructors
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
 	public UsersManager() {
 		super();
 		userDAO = new UserDAO();
 	}
-
-	// Methods
 
 	// Connexion
 
@@ -78,7 +75,7 @@ public class UsersManager {
 		String hashpass = null;
 		try {
 			// Cryptage du mot de passe pour comparaison en base
-			hashpass = GlobalTools.hash(password.trim());
+			hashpass = GlobalTools.hash256(password.trim());
 
 			// Vérification du login et mdp en base, renvoi user valide ou exceptions
 			user = userDAO.getUser(username.trim(), hashpass);
@@ -307,7 +304,7 @@ public class UsersManager {
 		// Si tout est ok, ajoute l'utilisateur
 		if (validReCaptcha && availableLogin && availableEmail) {
 			// Créé l'utilisateur (par défaut non activé, et token de validation chargé)
-			user = new User(username.trim(), hashPass, email.trim(), null, validToken, false, null, null, null,
+			user = new User(username.trim(), hashPass, email.trim(), null, validToken, false, null, null, null, null,
 					Timestamp.valueOf(LocalDateTime.now()));
 
 			// Ajoute l'utilisateur en base
@@ -364,7 +361,7 @@ public class UsersManager {
 		}
 		// Vérifie si le mot de passe est valide (correctement hashable)
 		try {
-			hashPass = GlobalTools.hash(password.trim());
+			hashPass = GlobalTools.hash256(password.trim());
 		} catch (FonctionnalException fex) {
 			throw new NewPassException("Le mot de passe n'est pas valide");
 		}
@@ -607,7 +604,7 @@ public class UsersManager {
 
 		// Vérifie si le mot de passe est valide (correctement hashable)
 		try {
-			hashPass = GlobalTools.hash(newPassword.trim());
+			hashPass = GlobalTools.hash256(newPassword.trim());
 		} catch (FonctionnalException fex) {
 			throw new NewPassException("Le mot de passe n'est pas valide");
 		}
@@ -677,12 +674,12 @@ public class UsersManager {
 			}
 			// Vérifie si le nouveau mot de passe est valide (correctement hashable)
 			try {
-				newHash = GlobalTools.hash(newPassword.trim());
+				newHash = GlobalTools.hash256(newPassword.trim());
 			} catch (FonctionnalException fex) {
 				throw new NewPassException("Le nouveau mot de passe n'est pas valide");
 			}
 			// Vérification si ancien mot de passe est valide
-			if (user.getPass().equals(GlobalTools.hash(oldPassword.trim()))) {
+			if (user.getPass().equals(GlobalTools.hash256(oldPassword.trim()))) {
 				logger.debug("Modification du compte possible");
 			} else {
 				throw new OldPassException("L'ancien mot de passe n'est pas valide");

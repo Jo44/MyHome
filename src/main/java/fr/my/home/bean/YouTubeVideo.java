@@ -1,122 +1,100 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
+import fr.my.home.tool.GlobalTools;
 
 /**
- * Bean YouTubeVideo qui stocke les informations d'une vidéo YouTube (pour transfert JSP)
+ * Bean YouTubeVideo
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
-public class YouTubeVideo implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
+public class YouTubeVideo {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private String id;
-	private String playlistId;
-	private String itemPlaylistId;
+	private String playlist_id;
+	private String item_id;
 	private String title;
-	private String urlImage;
-	private int totalResults;
-	private String prevPageToken;
-	private String nextPageToken;
-
-	// Constructors
+	private String url_image;
+	private int total_results;
+	private String prev_page_token;
+	private String next_page_token;
 
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public YouTubeVideo() {
-		super();
-	}
+	public YouTubeVideo() {}
 
 	/**
-	 * Constructor
+	 * Constructeur
 	 * 
 	 * @param id
-	 * @param playlistId
-	 * @param itemPlaylistId
+	 * @param playlist_id
+	 * @param item_id
 	 * @param title
-	 * @param urlImage
-	 * @param totalResults
-	 * @param prevPageToken
-	 * @param nextPageToken
+	 * @param url_image
+	 * @param total_results
+	 * @param prev_page_token
+	 * @param next_page_token
 	 */
-	public YouTubeVideo(String id, String playlistId, String itemPlaylistId, String title, String urlImage, int totalResults, String prevPageToken,
-			String nextPageToken) {
-		this();
+	public YouTubeVideo(String id, String playlist_id, String item_id, String title, String url_image, int total_results, String prev_page_token,
+			String next_page_token) {
 		this.id = id;
-		this.playlistId = playlistId;
-		this.itemPlaylistId = itemPlaylistId;
+		this.playlist_id = playlist_id;
+		this.item_id = item_id;
 		this.title = title;
-		this.urlImage = urlImage;
-		this.totalResults = totalResults;
-		this.prevPageToken = prevPageToken;
-		this.nextPageToken = nextPageToken;
+		this.url_image = url_image;
+		this.total_results = total_results;
+		this.prev_page_token = prev_page_token;
+		this.next_page_token = next_page_token;
 	}
-
-	// Methods
 
 	/**
-	 * To String
+	 * Getters
 	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(id);
-		sb.append(" , Playlist ID: ");
-		sb.append(playlistId);
-		sb.append(" , Item Playlist ID: ");
-		sb.append(itemPlaylistId);
-		sb.append(" , Title: ");
-		sb.append(title);
-		sb.append(" , URL Image: ");
-		sb.append(urlImage);
-		sb.append(" , Total Results: ");
-		sb.append(String.valueOf(totalResults));
-		sb.append(" , Previous Page Token: ");
-		sb.append(prevPageToken);
-		sb.append(" , Next Page Token: ");
-		sb.append(nextPageToken);
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters
 
 	public String getId() {
 		return id;
 	}
 
 	public String getPlaylistId() {
-		return playlistId;
+		return playlist_id;
 	}
 
 	public String getItemPlaylistId() {
-		return itemPlaylistId;
+		return item_id;
 	}
 
 	public String getTitle() {
 		return title;
 	}
 
+	public String getShortTitle() {
+		return title.length() > 30 ? title.substring(0, 30) + ".." : title;
+	}
+
+	public String getYoutubeTitle() {
+		return GlobalTools.formattedYTTitle(title);
+	}
+
 	public String getUrlImage() {
-		return urlImage;
+		return url_image;
 	}
 
 	public int getTotalResults() {
-		return totalResults;
+		return total_results;
 	}
 
 	public String getPrevPageToken() {
-		return prevPageToken;
+		return prev_page_token;
 	}
 
 	public String getNextPageToken() {
-		return nextPageToken;
+		return next_page_token;
 	}
 
 }

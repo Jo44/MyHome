@@ -1,9 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -13,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="home.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/home/home.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/home/home.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -37,7 +31,9 @@
 								<i class="fas fa-home fa-fw"></i> <fmt:message key="home.header" />
 							</div>
 							<div class="panel-body panel-home">
+								<!-- The cake is a lie -->
 								<span id="secret" class="unselectable"><fmt:message key="home.secret" /></span>
+								<!-- Shhhhh ! This will be our secret ;) -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -47,12 +43,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

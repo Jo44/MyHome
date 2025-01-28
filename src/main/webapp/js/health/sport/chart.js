@@ -98,7 +98,7 @@ function updatePeriod() {
 	}
 	
 	// Redirect
-	var url = '/health/sports?action=list&from=';
+	var url = path + '/health/sports?action=list&from=';
 	url += dateFrom;
 	url += '&to=';
 	url += dateTo;

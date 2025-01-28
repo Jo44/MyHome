@@ -1,8 +1,5 @@
 package fr.my.home.dao.implementation;
 
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -10,19 +7,23 @@ import fr.my.home.bean.User;
 import fr.my.home.dao.HibernateDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.tool.DatabaseAccess;
+import fr.my.home.tool.HibernateUtil;
 import fr.my.home.tool.properties.Settings;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 
 /**
- * Classe UserDAO qui gère le stockage des utilisateurs
+ * Classe UserDAO
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class UserDAO implements HibernateDAO<User> {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private static final String USERDAO_GET_BY_LOGINS = Settings.getStringProperty("user.get.by.logins");
 	private static final String USERDAO_GET_BY_USERNAME = Settings.getStringProperty("user.get.by.username");
@@ -32,16 +33,10 @@ public class UserDAO implements HibernateDAO<User> {
 	private static final String USERDAO_GET_BY_REINIT_TOKEN = Settings.getStringProperty("user.get.by.reinit.token");
 	private static final String USERDAO_GET_NAME_BY_ID = Settings.getStringProperty("user.get.name.by.id");
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public UserDAO() {
-		super();
-	}
-
-	// Methods
+	public UserDAO() {}
 
 	/**
 	 * Récupère l'utilisateur associé au couple username/password, ou exception fonctionnelle si il n'existe pas
@@ -54,17 +49,17 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUser(String username, String password) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_LOGINS);
-		query.setParameter("user_name", username);
-		query.setParameter("user_pass", password);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_LOGINS, User.class);
+		query.setParameter("name", username);
+		query.setParameter("pass", password);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("L'utilisateur n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -80,16 +75,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUserByUsername(String username) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_USERNAME);
-		query.setParameter("user_name", username);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_USERNAME, User.class);
+		query.setParameter("name", username);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le login n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -105,16 +100,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUserByEmail(String email) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_EMAIL);
-		query.setParameter("user_email", email);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_EMAIL, User.class);
+		query.setParameter("email", email);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("L'email n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -129,16 +124,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUserByRememberMeToken(String rememberMeToken) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_REMEMBER_ME_TOKEN);
-		query.setParameter("user_remember_me_token", rememberMeToken);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_REMEMBER_ME_TOKEN, User.class);
+		query.setParameter("remember_me_token", rememberMeToken);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le token 'Remember Me' n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -154,16 +149,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUserByValidationToken(String validationToken) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_VALIDATION_TOKEN);
-		query.setParameter("user_validation_token", validationToken);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_VALIDATION_TOKEN, User.class);
+		query.setParameter("validation_token", validationToken);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le token de validation n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -179,16 +174,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public User getUserByReInitToken(String reInitToken) throws FonctionnalException, TechnicalException {
 		User user = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_BY_REINIT_TOKEN);
-		query.setParameter("user_reinit_token", reInitToken);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_BY_REINIT_TOKEN, User.class);
+		query.setParameter("reinit_token", reInitToken);
+		query.setMaxResults(1);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("Le token de ré-initialisation n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return user;
 	}
@@ -202,40 +197,42 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	public String getNameById(int userId) throws TechnicalException {
 		String userName = "???";
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<User> query = session.createQuery(USERDAO_GET_NAME_BY_ID);
-		query.setParameter("user_id", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<User> query = session.createQuery(USERDAO_GET_NAME_BY_ID, User.class);
+		query.setParameter("id", userId);
+		query.setMaxResults(1);
 		try {
 			User user = query.getSingleResult();
 			userName = user.getName();
 		} catch (Exception ex) {
 			userName = "???";
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return userName;
 	}
 
 	/**
-	 * Ajoute un nouvel utilisateur et renvoi son ID, ou exception fonctionnelle si impossible
+	 * Ajoute un nouvel utilisateur, ou exception fonctionnelle si impossible
 	 * 
 	 * @param user
-	 * @return int
 	 * @param FonctionnalException
 	 * @throws TechnicalException
 	 */
 	@Override
-	public int add(User user) throws FonctionnalException, TechnicalException {
-		int id = 0;
-		Session session = DatabaseAccess.getInstance().openSession();
+	public void add(User user) throws FonctionnalException, TechnicalException {
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			id = (int) session.save(user);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.persist(user);
+			session.flush();
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible d'ajouter l'utilisateur");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
-		return id;
 	}
 
 	/**
@@ -247,12 +244,16 @@ public class UserDAO implements HibernateDAO<User> {
 	 */
 	@Override
 	public void update(User user) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.saveOrUpdate(user);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.merge(user);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de mettre à jour l'utilisateur");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 
@@ -266,12 +267,16 @@ public class UserDAO implements HibernateDAO<User> {
 	@Override
 	public void delete(User user) throws FonctionnalException, TechnicalException {
 		// Utilisation interdite, uniquement pour test
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.delete(user);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.remove(user);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de supprimer l'utilisateur");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 

@@ -1,15 +1,3 @@
-<%@ page import="java.text.SimpleDateFormat"%>
-<%@ page import="java.util.*"%>
-<%@ page import="fr.my.home.bean.Note"%>
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	Note note = (Note) view.getValueForKey("note");
-	SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - HH:mm");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -19,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="notes.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/notes/notes.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/notes/notes.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -43,27 +31,37 @@
 								<i class="fas fa-edit fa-fw"></i> <fmt:message key="notes.details.header" />
 								<div class="pull-right">
 									<button type="button" class="btn btn-danger btn-xs btn-fixed" data-toggle="modal" data-target=".modal-confirm" data-backdrop="static"><fmt:message key="global.delete" /></button>
-									<a class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/notes"><fmt:message key="global.back" /></a>
+									<a class="btn btn-primary btn-xs btn-fixed" href="${pageContext.request.contextPath}/notes"><fmt:message key="global.back" /></a>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
 							<div class="panel-body no-padding">
 								<table class="table table-striped">
 									<tr>
-										<th class="col-xs-3"><fmt:message key="global.date" /> - <fmt:message key="global.time" /></th>
-										<td class="col-xs-9"><%=formatter.format(note.getSaveDate())%></td>
+										<th class="col-xs-3">
+											<fmt:message key="global.date" /> - <fmt:message key="global.time" />
+										</th>
+										<td class="col-xs-9">
+											<fmt:formatDate value="${note.saveDate}" pattern="${requestScope.formatterDate.toPattern()}" />
+										</td>
 									</tr>
 									<tr>
-										<th><fmt:message key="global.title" /></th>
-										<td class="note-title"><%=note.getTitle()%></td>
+										<th>
+											<fmt:message key="global.title" />
+										</th>
+										<td class="note-title">
+											${note.title}
+										</td>
 									</tr>
 									<tr>
-										<th><fmt:message key="global.message" /></th>
+										<th>
+											<fmt:message key="global.message" />
+										</th>
 										<td></td>
 									</tr>
 								</table>
-								<div class="message-box center scroll"><%=note.getMessage()%></div>
-								<!-- modal : confirmation suppression -->
+								<div class="message-box center scroll">${note.message}</div>
+								<!-- Confirm Delete Modal -->
 								<div class="modal fade modal-confirm" tabindex="-1" role="dialog" aria-labelledby="modal_label">
 									<div class="modal-dialog modal-sm" role="document">
 										<div class="modal-content">
@@ -77,12 +75,13 @@
 												<p><fmt:message key="notes.delete" /></p>
 											</div>
 											<div class="modal-footer center">
-												<a href="<%=path%>/notes?action=delete&id=<%=note.getId()%>" id="delModalBtn" class="btn btn-danger btn-sm btn-fixed"><fmt:message key="global.delete" /></a>
+												<a href="${pageContext.request.contextPath}/notes?action=delete&id=${note.id}" id="delModalBtn" class="btn btn-danger btn-sm btn-fixed"><fmt:message key="global.delete" /></a>
 												<button type="button" class="btn btn-primary btn-sm btn-fixed" data-dismiss="modal"><fmt:message key="global.cancel" /></button>
 											</div>
 										</div>
 									</div>
 								</div>
+								<!-- End Confirm Delete Modal -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -92,12 +91,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

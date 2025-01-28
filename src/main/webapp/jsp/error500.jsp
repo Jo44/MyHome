@@ -1,8 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -12,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="500.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/error.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/error.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -33,9 +28,9 @@
 					<div class="col-xs-offset-1 col-xs-10 center">
 						<h2><fmt:message key="500.header" /></h2>
 						<h3><fmt:message key="500.message" /></h3>
-						<h4><fmt:message key="global.myhome.url" /><%=request.getAttribute("javax.servlet.forward.request_uri")%></h4>
+						<h4><fmt:message key="global.myhome.url" />${request.getAttribute("jakarta.servlet.forward.request_uri")}</h4>
 						<h4>
-							<a class="grey-link marged-top" href="<%=path%>/status_inside"><i class="fas fa-arrow-alt-circle-right fa-fw"></i> <fmt:message key="500.status" /></a>
+							<a class="grey-link marged-top" href="${pageContext.request.contextPath}/status_inside"><i class="fas fa-arrow-alt-circle-right fa-fw"></i> <fmt:message key="500.status" /></a>
 						</h4>
 					</div>
 				</div>
@@ -43,12 +38,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

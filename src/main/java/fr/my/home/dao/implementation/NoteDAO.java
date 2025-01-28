@@ -3,9 +3,6 @@ package fr.my.home.dao.implementation;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -13,33 +10,31 @@ import fr.my.home.bean.Note;
 import fr.my.home.dao.HibernateDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.tool.DatabaseAccess;
+import fr.my.home.tool.HibernateUtil;
 import fr.my.home.tool.properties.Settings;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 
 /**
- * Classe NoteDAO qui gère le stockage des notes
+ * Classe NoteDAO
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class NoteDAO implements HibernateDAO<Note> {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private static final String NOTEDAO_GET_ALL = Settings.getStringProperty("note.get.all");
 	private static final String NOTEDAO_GET_ONE = Settings.getStringProperty("note.get.one");
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public NoteDAO() {
-		super();
-	}
-
-	// Methods
+	public NoteDAO() {}
 
 	/**
 	 * Récupère la liste de toutes les notes de l'utilisateur
@@ -50,12 +45,11 @@ public class NoteDAO implements HibernateDAO<Note> {
 	 */
 	public List<Note> getAllNotes(int userId) throws TechnicalException {
 		List<Note> listNote = new ArrayList<Note>();
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Note> query = session.createQuery(NOTEDAO_GET_ALL);
-		query.setParameter("note_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Note> query = session.createQuery(NOTEDAO_GET_ALL, Note.class);
+		query.setParameter("id_user", userId);
 		listNote = query.getResultList();
-		DatabaseAccess.getInstance().validateSession(session);
+		HibernateUtil.getInstance().validateSession(session);
 		return listNote;
 	}
 
@@ -70,40 +64,42 @@ public class NoteDAO implements HibernateDAO<Note> {
 	 */
 	public Note getOneNote(int noteId, int userId) throws FonctionnalException, TechnicalException {
 		Note note = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Note> query = session.createQuery(NOTEDAO_GET_ONE);
-		query.setParameter("note_id", noteId);
-		query.setParameter("note_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Note> query = session.createQuery(NOTEDAO_GET_ONE, Note.class);
+		query.setParameter("id", noteId);
+		query.setParameter("id_user", userId);
+		query.setMaxResults(1);
 		try {
 			note = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("La note n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return note;
 	}
 
 	/**
-	 * Ajoute une nouvelle note en base et renvoi son ID, ou exception fonctionnelle si impossible
+	 * Ajoute une nouvelle note, ou exception fonctionnelle si impossible
 	 * 
 	 * @param note
-	 * @return int
 	 * @param FonctionnalException
 	 * @throws TechnicalException
 	 */
 	@Override
-	public int add(Note note) throws FonctionnalException, TechnicalException {
-		int id = 0;
-		Session session = DatabaseAccess.getInstance().openSession();
+	public void add(Note note) throws FonctionnalException, TechnicalException {
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			id = (int) session.save(note);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.persist(note);
+			session.flush();
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible d'ajouter la note");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
-		return id;
 	}
 
 	/**
@@ -115,12 +111,16 @@ public class NoteDAO implements HibernateDAO<Note> {
 	 */
 	@Override
 	public void update(Note note) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.saveOrUpdate(note);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.merge(note);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de mettre à jour la note");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 
@@ -133,12 +133,16 @@ public class NoteDAO implements HibernateDAO<Note> {
 	 */
 	@Override
 	public void delete(Note note) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.delete(note);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.remove(note);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de supprimer la note");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 

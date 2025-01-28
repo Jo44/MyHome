@@ -22,21 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe SportDAOTest qui teste le stockage des activités sportives
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class SportDAOTest {
 
-	// Attributs
-	private SportDAO sportDAO;
-	private Timestamp now;
-	private Timestamp previousDay;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private SportDAO sportDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public SportDAOTest() {
 		super();
 		sportDAO = new SportDAO();
-		now = Timestamp.valueOf(LocalDateTime.now());
-		previousDay = Timestamp.valueOf(LocalDateTime.now().minusMonths(3L));
 	}
 
 	/**
@@ -58,7 +59,8 @@ public class SportDAOTest {
 	public void getAllSportsFromPeriodOk() {
 		List<Sport> listSport = null;
 		try {
-			listSport = sportDAO.getAllSportsFromPeriod(0, previousDay, now);
+			listSport = sportDAO.getAllSportsFromPeriod(0, Timestamp.valueOf(LocalDateTime.now().minusMonths(3L)),
+					Timestamp.valueOf(LocalDateTime.now()));
 		} catch (TechnicalException ex) {
 			listSport = null;
 		}
@@ -70,7 +72,7 @@ public class SportDAOTest {
 	 */
 	@Test
 	public void getOneSportOk() {
-		Sport sport = new Sport(1, "activity", now);
+		Sport sport = new Sport(1, "activity", Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			sportDAO.add(sport);
 			sport = sportDAO.getOneSport(sport.getId(), 1);
@@ -100,23 +102,21 @@ public class SportDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		Sport sport = null;
+		boolean valid = false;
+		Sport sport = new Sport(1, "activity", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			sport = new Sport(1, "activity", now);
-			id = sportDAO.add(sport);
+			sportDAO.add(sport);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					sportDAO.delete(sport);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				sportDAO.delete(sport);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -124,14 +124,19 @@ public class SportDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		Sport sport = new Sport(1, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			Sport sport = new Sport(1, null, null);
-			id = sportDAO.add(sport);
+			sportDAO.add(sport);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				sportDAO.delete(sport);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -140,20 +145,20 @@ public class SportDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		Sport sport = new Sport(1, "activity", now);
+		Sport sport = new Sport(1, "activity", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = sportDAO.add(sport);
+			sportDAO.add(sport);
 			try {
 				sport.setActivity("anotherActivity");
 				sportDAO.update(sport);
 				valid = true;
+			} catch (FonctionnalException | TechnicalException ex) {
+				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						sportDAO.delete(sport);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					sportDAO.delete(sport);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -168,21 +173,21 @@ public class SportDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		Sport sport = new Sport(1, "activity", now);
+		Sport sport = new Sport(1, "activity", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = sportDAO.add(sport);
+			sportDAO.add(sport);
 			try {
 				sport.setActivity(null);
 				sportDAO.update(sport);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						sportDAO.delete(sport);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					sport.setActivity("activity");
+					sportDAO.delete(sport);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -197,7 +202,7 @@ public class SportDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		Sport sport = new Sport(1, "activity", now);
+		Sport sport = new Sport(1, "activity", Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			sportDAO.add(sport);
 			sportDAO.delete(sport);

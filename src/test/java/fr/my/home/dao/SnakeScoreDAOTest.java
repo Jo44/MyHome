@@ -22,19 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe SnakeSportDAOTest qui teste le stockage des scores de Snake
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class SnakeScoreDAOTest {
 
-	// Attributs
-	private SnakeScoreDAO scoreDAO;
-	private Timestamp now;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private SnakeScoreDAO scoreDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public SnakeScoreDAOTest() {
 		super();
 		scoreDAO = new SnakeScoreDAO();
-		now = Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class SnakeScoreDAOTest {
 	 */
 	@Test
 	public void getPBOk() {
-		SnakeScore score = new SnakeScore(1, 333, now);
+		SnakeScore score = new SnakeScore(1, 333, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			scoreDAO.add(score);
 			score = scoreDAO.getPB(score.getIdUser());
@@ -98,23 +101,21 @@ public class SnakeScoreDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		SnakeScore score = null;
+		boolean valid = false;
+		SnakeScore score = new SnakeScore(1, 555, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			score = new SnakeScore(1, 555, now);
-			id = scoreDAO.add(score);
+			scoreDAO.add(score);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					scoreDAO.delete(score);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				scoreDAO.delete(score);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -122,14 +123,19 @@ public class SnakeScoreDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		SnakeScore score = new SnakeScore(1, 666, null);
 		try {
-			SnakeScore score = new SnakeScore(1, 666, null);
-			id = scoreDAO.add(score);
+			scoreDAO.add(score);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				scoreDAO.delete(score);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -138,20 +144,20 @@ public class SnakeScoreDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		SnakeScore score = new SnakeScore(1, 777, now);
+		SnakeScore score = new SnakeScore(1, 777, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = scoreDAO.add(score);
+			scoreDAO.add(score);
 			try {
 				score.setSaveDate(Timestamp.valueOf(LocalDateTime.now()));
 				scoreDAO.update(score);
 				valid = true;
+			} catch (FonctionnalException | TechnicalException ex) {
+				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						scoreDAO.delete(score);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					scoreDAO.delete(score);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -166,21 +172,22 @@ public class SnakeScoreDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		SnakeScore score = new SnakeScore(1, 888, now);
+		Timestamp ts = Timestamp.valueOf(LocalDateTime.now());
+		SnakeScore score = new SnakeScore(1, 888, ts);
 		try {
-			int id = scoreDAO.add(score);
+			scoreDAO.add(score);
 			try {
 				score.setSaveDate(null);
 				scoreDAO.update(score);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						scoreDAO.delete(score);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					score.setSaveDate(ts);
+					scoreDAO.delete(score);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -195,7 +202,7 @@ public class SnakeScoreDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		SnakeScore score = new SnakeScore(1, 999, now);
+		SnakeScore score = new SnakeScore(1, 999, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			scoreDAO.add(score);
 			scoreDAO.delete(score);

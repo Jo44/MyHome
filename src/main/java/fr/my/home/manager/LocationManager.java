@@ -12,22 +12,23 @@ import fr.my.home.tool.properties.Settings;
  * Manager qui prends en charge la gestion de la localisation d'une IP ou nom de domaine
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class LocationManager {
-	private static final Logger logger = LogManager.getLogger(LocationManager.class);
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final Logger logger = LogManager.getLogger(LocationManager.class);
+
+	/**
+	 * Constructeur
 	 */
 	public LocationManager() {
 		super();
 	}
-
-	// Methods
 
 	/**
 	 * Formatte le string pour enlever le protocol https/http et le sous domaine www si présents

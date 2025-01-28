@@ -12,21 +12,17 @@ import fr.my.home.tool.properties.Settings;
  * Manager qui prends en charge la gestion de l'envoi du message d'aide à l'administrateur
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class HelpManager {
 
-	// Constructors
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
 	public HelpManager() {
 		super();
 	}
-
-	// Methods
 
 	/**
 	 * Vérifie le message, le reCaptcha et l'utilisateur puis envoi le message à l'administrateur en fonction de la localisation

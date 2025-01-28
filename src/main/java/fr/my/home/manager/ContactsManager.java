@@ -24,27 +24,25 @@ import fr.my.home.tool.GlobalTools;
  * Manager qui prends en charge la gestion des contacts
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class ContactsManager {
-	private static final Logger logger = LogManager.getLogger(ContactsManager.class);
-
-	// Attributes
-
-	private ContactDAO contactDAO;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final Logger logger = LogManager.getLogger(ContactsManager.class);
+	private ContactDAO contactDAO;
+
+	/**
+	 * Constructeur
 	 */
 	public ContactsManager() {
 		super();
 		contactDAO = new ContactDAO();
 	}
-
-	// Methods
 
 	/**
 	 * Récupère la liste des contacts pour l'utilisateur connecté
@@ -169,7 +167,7 @@ public class ContactsManager {
 	}
 
 	/**
-	 * Supprime le contact ou message d'erreur dans la view si besoin
+	 * Supprime le contact ou exception fonctionnelle si problème
 	 * 
 	 * @param contact
 	 * @throws FonctionnalException

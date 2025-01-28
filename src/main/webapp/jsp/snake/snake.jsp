@@ -1,11 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	String error = (String) view.getValueForKey("error");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -15,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="snake.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/snake/snake.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/snake/snake.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -39,26 +31,31 @@
 								<i class="fa fa-dragon fa-fw"></i> <fmt:message key="snake.header" />
 							</div>
 							<div class="panel-body">
+								<!-- Snake -->
 								<div id="focusCatcher" tabindex="-1"></div>
 								<noscript class="col-xs-offset-1 col-xs-10 center big-spaced-vertical"><fmt:message key="javascript.snake" /></noscript>
+								<!-- Scores -->
 								<div id="scoreDisplay">
 									<span> High score   : </span><span id="highscore">0</span><br />
 									<span>Current score : </span><span id="score">0</span>
 								</div>
+								<!-- Game -->
 								<canvas id="snakeCanvas" width="600" height="600"></canvas>
 								<div class="row">
+									<!-- Game Controls -->
 									<div id="gameControls" class="col-xs-6">
 										<select id="level">
-									        <option value="0" selected>Level 1</option>
-									        <option value="1">Level 2</option>
-									        <option value="2">Level 3</option>
+									        <option value="1" selected>Level 1</option>
+									        <option value="2">Level 2</option>
+									        <option value="3">Level 3</option>
 									    </select>
 									    <select id="speed">
-									        <option value="100" selected>Speed x1</option>
-									        <option value="75">Speed x1.5</option>
-									        <option value="50">Speed x2</option>
+									        <option value="1" selected>Speed x1</option>
+									        <option value="2">Speed x2</option>
+									        <option value="3">Speed x3</option>
 									    </select>
 									</div>
+									<!-- Audio Controls -->
 									<div id="audioControls" class="col-xs-6">
 									    <button id="muteMusic" class="btn btn-classic btn-xs"></button>
 									    <div id="volumeControl">
@@ -68,6 +65,7 @@
 									    <button id="muteFx" class="btn btn-classic btn-xs"></button>
 									</div>
 								</div>
+								<!-- End Snake -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -77,17 +75,17 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- Snake JavaScript -->
 	<script>
-		var path = "<%=path%>";
+		var path = "${pageContext.request.contextPath}";
 	</script>
-	<script src="<%=path%>/js/snake/snake.js"></script>
+	<script src="${pageContext.request.contextPath}/js/snake/snake.js"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

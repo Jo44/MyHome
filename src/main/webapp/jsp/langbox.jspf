@@ -1,35 +1,35 @@
-<%
-	String servletPath = (String) request.getAttribute("javax.servlet.forward.request_uri");
-	String queryString = (String) request.getAttribute("javax.servlet.forward.query_string");
-	String queryEnLang = "";
-	String queryFrLang = "";
-	
-	if (queryString == null || queryString.startsWith("lang=")) {
-		queryEnLang = "?lang=en";
-		queryFrLang = "?lang=fr";
-	} else {
-		int index = queryString.lastIndexOf("&lang=");
-		if (index != -1) {
-			queryString = queryString.substring(0, index);
-		}
-		queryEnLang = "?" + queryString + "&lang=en";
-		queryFrLang = "?" + queryString + "&lang=fr";
-	}
-%>
 	<ul id="lang-menu">
 		<li><a class="unselectable">
 			<c:choose>
 				<c:when test="${sessionScope.lang == 'fr'}">
-					<img id="lang-flag" class="flag-img" src="<%=path%>/img/flag/flag-france.png" alt="FR" />
+					<img id="lang-flag" class="flag-img" src="${pageContext.request.contextPath}/img/flag/flag-france.png" alt="FR" />
 				</c:when>
 				<c:otherwise>
-					<img id="lang-flag" class="flag-img" src="<%=path%>/img/flag/flag-us.png" alt="US" />
+					<img id="lang-flag" class="flag-img" src="${pageContext.request.contextPath}/img/flag/flag-us.png" alt="US" />
 				</c:otherwise>
 			</c:choose>
 			 <b class="caret"></b></a>
 			<ul>
-				<li><a href="<%=servletPath%><%=queryEnLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-us.png" alt="US" /><span class="flag-label">US</span></a></li>
-				<li><a href="<%=servletPath%><%=queryFrLang%>"><img class="flag-img" src="<%=path%>/img/flag/flag-france.png" alt="FR" /><span class="flag-label">FR</span></a></li>
+				<!-- Queries -->
+				<c:set var="servletPath" value="${request.getAttribute('jakarta.servlet.forward.request_uri')}" />
+				<c:set var="queryString" value="${request.getAttribute('jakarta.servlet.forward.query_string')}" />
+				<c:choose>
+				    <c:when test="${empty queryString || fn:startsWith(queryString, 'lang=')}">
+				        <c:set var="queryEnLang" value="?lang=en"/>
+				        <c:set var="queryFrLang" value="?lang=fr"/>
+				    </c:when>
+				    <c:otherwise>
+				        <c:set var="index" value="${fn:indexOf(queryString, '&lang=')}" />
+				        <c:if test="${index != -1}">
+				            <c:set var="queryString" value="${fn:substring(queryString, 0, index)}" />
+				        </c:if>
+				        <c:set var="queryEnLang" value="?${queryString}&lang=en" />
+				        <c:set var="queryFrLang" value="?${queryString}&lang=fr" />
+				    </c:otherwise>
+				</c:choose>
+				<!-- End Queries -->
+				<li><a href="${servletPath}${queryEnLang}"><img class="flag-img" src="${pageContext.request.contextPath}/img/flag/flag-us.png" alt="US" /><span class="flag-label">US</span></a></li>
+				<li><a href="${servletPath}${queryFrLang}"><img class="flag-img" src="${pageContext.request.contextPath}/img/flag/flag-france.png" alt="FR" /><span class="flag-label">FR</span></a></li>
 			</ul>
 		</li>
 	</ul>

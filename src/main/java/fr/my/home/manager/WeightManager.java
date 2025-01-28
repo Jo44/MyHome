@@ -22,26 +22,24 @@ import fr.my.home.exception.health.weights.NotExistException;
  * 
  * @author Jonathan
  * @version 1.1
- * @since 15/08/2021
+ * @since 15/01/2025
  */
 public class WeightManager {
-	private static final Logger logger = LogManager.getLogger(WeightManager.class);
-
-	// Attributes
-
-	private WeightDAO weightDAO;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final Logger logger = LogManager.getLogger(WeightManager.class);
+	private WeightDAO weightDAO;
+
+	/**
+	 * Constructeur
 	 */
 	public WeightManager() {
 		super();
 		weightDAO = new WeightDAO();
 	}
-
-	// Methods
 
 	/**
 	 * Récupère la liste des poids pour l'utilisateur connecté pour la période précisée

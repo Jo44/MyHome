@@ -232,6 +232,10 @@ p {
 	min-width: 80px;
 }
 
+.btn-large {
+	min-width: 160px;
+}
+
 .actions-button i {
 	color: black;
 	text-shadow: 0px 0px 1px white;
@@ -252,11 +256,12 @@ p {
 	cursor: pointer;
 }
 
-/* Liens */
+/* Filter Arrows */
 .order-arrow, .order-arrow:focus, .order-arrow:visited, .order-arrow:hover,
 	.order-arrow:active {
 	text-decoration: none;
 	color: #909090;
+	margin: 0px 0px 0px 8px;
 }
 
 /* ReCaptcha */
@@ -623,6 +628,12 @@ select {
 /* Iframe */
 iframe {
 	border: none;
+}
+
+/* Liens */
+#createYTAccount, #createYTAccount:hover {
+	text-decoration: none;
+	color: #bbb;
 }
 
 /* PlaceHolder */

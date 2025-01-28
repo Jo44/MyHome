@@ -1,8 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -12,15 +7,15 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="health.main.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/health/health.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/health/health.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -36,30 +31,34 @@
 								<i class="fas fa-heartbeat fa-fw"></i> <fmt:message key="health.main.header" />
 							</div>
 							<div class="panel-body big-marged-top marged-bottom">
+								<!-- Food -->
 								<div class="col-xs-4 info-block unselectable">
 									<div class="marged-bottom">
-										<a href="<%=path%>/health/food"><img class="info-img" src="<%=path%>/img/health/food.png" alt="<fmt:message key="health.food" />" /></a>
+										<a href="${pageContext.request.contextPath}/health/food"><img class="info-img" src="${pageContext.request.contextPath}/img/health/food.png" alt="<fmt:message key="health.food" />" /></a>
 									</div>
 									<div>
-										<a href="<%=path%>/health/food"><span class="info-label"><fmt:message key="health.food" /></span></a>
+										<a href="${pageContext.request.contextPath}/health/food"><span class="info-label"><fmt:message key="health.food" /></span></a>
 									</div>
 								</div>
+								<!-- Sport -->
 								<div class="col-xs-4 info-block unselectable">
 									<div class="marged-bottom">
-										<a href="<%=path%>/health/sports"><img class="info-img" src="<%=path%>/img/health/sport.png" alt="<fmt:message key="health.sport" />" /></a>
+										<a href="${pageContext.request.contextPath}/health/sports"><img class="info-img" src="${pageContext.request.contextPath}/img/health/sport.png" alt="<fmt:message key="health.sport" />" /></a>
 									</div>
 									<div>
-										<a href="<%=path%>/health/sports"><span class="info-label"><fmt:message key="health.sport" /></span></a>
+										<a href="${pageContext.request.contextPath}/health/sports"><span class="info-label"><fmt:message key="health.sport" /></span></a>
 									</div>
 								</div>
+								<!-- Weight -->
 								<div class="col-xs-4 info-block unselectable">
 									<div class="marged-bottom">
-										<a href="<%=path%>/health/weights"><img class="info-img" src="<%=path%>/img/health/weight.png" alt="<fmt:message key="health.weight" />" /></a>
+										<a href="${pageContext.request.contextPath}/health/weights"><img class="info-img" src="${pageContext.request.contextPath}/img/health/weight.png" alt="<fmt:message key="health.weight" />" /></a>
 									</div>
 									<div>
-										<a href="<%=path%>/health/weights"><span class="info-label"><fmt:message key="health.weight" /></span></a>
+										<a href="${pageContext.request.contextPath}/health/weights"><span class="info-label"><fmt:message key="health.weight" /></span></a>
 									</div>
 								</div>
+								<!-- End -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -69,12 +68,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

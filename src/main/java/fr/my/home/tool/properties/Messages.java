@@ -9,18 +9,18 @@ import org.apache.logging.log4j.Logger;
  * Classe en charge de récupérer en mémoire les messages de l'application via des fichiers 'messages.properties' + localisation
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class Messages {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(Messages.class);
-
-	// Attributes
-
 	private static Properties enProperties;
 	private static Properties frProperties;
-
-	// Methods
 
 	/**
 	 * Charge le fichier 'messages.properties' + localisation
@@ -38,8 +38,13 @@ public class Messages {
 		}
 	}
 
-	// Getters
-
+	/**
+	 * Retourne la valeur
+	 * 
+	 * @param key
+	 * @param lang
+	 * @return String
+	 */
 	public static String getProperty(String key, String lang) {
 		String parametre = "";
 		if (lang != null && lang.equals("fr")) {

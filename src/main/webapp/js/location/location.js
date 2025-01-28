@@ -10,9 +10,10 @@
 $('#map').show();
 
 // Set Google Map
-function initMap() {
+async function initMap() {
+	const { Map } = await google.maps.importLibrary("maps");
     var coordonnees = {lat: latParam, lng: lngParam};
-    var map = new google.maps.Map(document.getElementById('map'), {
+    var map = new Map(document.getElementById('map'), {
 	center: coordonnees,
 	zoom: 6,
 	styles: [

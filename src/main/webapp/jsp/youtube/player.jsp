@@ -1,16 +1,3 @@
-<%@ page import="java.util.*"%>
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%@ page import="fr.my.home.bean.YouTubePlaylist"%>
-<%@ page import="fr.my.home.bean.YouTubeVideo"%>
-<%@ page import="fr.my.home.tool.GlobalTools"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	List<YouTubePlaylist> listPlaylist = (List<YouTubePlaylist>) view.getValueForKey("listPlaylist");
-	List<YouTubeVideo> listVideo = (List<YouTubeVideo>) view.getValueForKey("listVideo");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -20,17 +7,17 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="yt.player.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- Font Awesome CSS -->
-<link href="<%=path%>/css/plugins/font-awesome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/font-awesome.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/youtube/youtube.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/youtube/youtube.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -43,57 +30,102 @@
 					<div class="col-xs-12 col-md-offset-1 col-md-10">
 						<div class="panel panel-default panel-player center-div">
 							<div class="panel-heading">
-								<div id="headerTitle" class="in-line">
-									<i class="fab fa-youtube fa-fw"></i> <fmt:message key="yt.player.header" />
-								</div>
+								<i class="fab fa-youtube fa-fw"></i> <fmt:message key="yt.player.header" />
 								<div class="pull-right">
-									<select id="selectVideo">
-										<option value="-1" selected><fmt:message key="yt.player.all.videos" /></option>
-										<%
-											for (YouTubeVideo video : listVideo) {
-												String title = video.getTitle().length() > 30 ? video.getTitle().substring(0, 30) + ".." : video.getTitle();
-												out.print("<option value='" + video.getId() + "'>" + title + "</option>");
-											}
-										%>
-									</select>
-									<select id="selectPlaylist">
-										<option value="-1" selected><fmt:message key="yt.player.all.playlists" /></option>
-										<%
-											for (YouTubePlaylist playlist : listPlaylist) {
-												String title = playlist.getTitle().length() > 30 ? playlist.getTitle().substring(0, 30) + ".." : playlist.getTitle();
-												out.print("<option value='" + playlist.getId() + "'>" + title + "</option>");
-											}
-										%>
-									</select>
-									<a id="headerButton" class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/youtube_playlists?action=list"><fmt:message key="yt.player.management" /></a>
+									<a class="btn btn-primary btn-xs btn-large" href="${pageContext.request.contextPath}/youtube_playlists?action=list"><fmt:message key="yt.player.management" /></a>
+								</div>
+								<div class="fixHeight"></div>
+							</div>
+							<div class="panel-heading">
+								<div id="selectPlayer">
+									<div>
+										<!-- Select Video -->
+										<select id="selectVideo">
+											<option value="-1" selected><fmt:message key="yt.player.all.videos" /></option>
+											<c:if test="${not empty requestScope.listVideo}">
+												<c:forEach items="${requestScope.listVideo}" var="video">
+													<option value="${video.id}">${video.shortTitle}</option>
+												</c:forEach>
+											</c:if>
+										</select>
+										<!-- Select Playlist -->
+										<select id="selectPlaylist">
+											<option value="-1" selected><fmt:message key="yt.player.all.playlists" /></option>
+											<c:if test="${not empty requestScope.listPlaylist}">
+												<c:forEach items="${requestScope.listPlaylist}" var="playlist">
+													<option value="${playlist.id}">${playlist.shortTitle}</option>
+												</c:forEach>
+											</c:if>
+										</select>
+									</div>
+									<div>
+										<!-- YouTube Infos Modal -->
+										<a id="ytInfos" class="btn btn-classic btn-xs" data-toggle="modal" data-target=".modal-infos" data-backdrop="static"><i class="fas fa-info-circle fa-fw"></i></a>
+										<div class="modal fade modal-infos" tabindex="-1" role="dialog" aria-labelledby="modal_label_infos">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content center">
+													<div class="modal-header">
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fas fa-times fa-fw white"></i></span></button>
+														<h4 id="modal_label_infos" class="modal-title"><fmt:message key="yt.global.infos.header" /></h4>
+													</div>
+													<div class="modal-body">
+														<p><fmt:message key="yt.global.infos.msg" /></p>
+													</div>
+													<div class="modal-footer center">
+														<button type="button" class="btn btn-primary btn-sm btn-fixed" data-dismiss="modal"><fmt:message key="global.close" /></button>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- Confirm Disconnect Modal -->
+										<a class="btn btn-primary btn-xs spaced-pad-horizontal" data-toggle="modal" data-target=".modal-confirm-disconnect" data-backdrop="static">${requestScope.channelName}</a>
+										<div class="modal fade modal-confirm-disconnect" tabindex="-1" role="dialog" aria-labelledby="modal_label_disconnect">
+											<div class="modal-dialog modal-sm" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fas fa-times fa-fw white"></i></span></button>
+														<h4 id="modal_label_disconnect" class="modal-title"><fmt:message key="global.confirm" /></h4>
+													</div>
+													<div class="modal-body">
+														<p><fmt:message key="yt.global.disconnect" /> ${requestScope.channelName} ?</p>
+													</div>
+													<div class="modal-footer center">
+														<a href="${pageContext.request.contextPath}/youtube_logout" id="modal_btn_disconnect" class="btn btn-danger btn-sm btn-fixed"><fmt:message key="yt.global.logout" /></a>
+														<button type="button" class="btn btn-primary btn-sm btn-fixed" data-dismiss="modal"><fmt:message key="global.cancel" /></button>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- End Confirm Disconnect Modal -->
+									</div>
+								</div>
+								<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger alert-player panel-notification center marged-top" role="alert">
+									<p><strong>Oops ! </strong><fmt:message key="error.yt.player" /> <span id="errorId"></span> )<i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
 							<div class="panel-body no-padding">
-								<%
-									if (listVideo != null && listVideo.size() > 0) {
-								%>
-								<noscript class="col-xs-offset-1 col-xs-10 big-spaced-vertical"><fmt:message key="javascript.yt.player" /></noscript>
-								<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger alert-player panel-notification center" role="alert">
-									<p><strong>Oops ! </strong><fmt:message key="error.yt.player" /> <span id="errorId"></span> )<i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
-								</div>
-								<div id="noValid" class="col-xs-offset-1 col-xs-10 big-spaced-vertical center">
-									<p><fmt:message key="yt.player.no.valid.msg1" /><br /><fmt:message key="yt.player.no.valid.msg2" /></p>
-								</div>
-								<div id="playerBox">
-									<div id="player"></div>
-								</div>
-								<%
-									} else {
-								%>
-								<div class="col-xs-offset-1 col-xs-10 big-spaced-vertical center">
-									<p><fmt:message key="yt.player.empty.msg1" /><br /><fmt:message key="yt.player.empty.msg2" /></p>
-								</div>
-								<%
-									}
-								%>
+								<c:choose>
+									<c:when test="${not empty requestScope.listVideo}">
+										<!-- Player Box -->
+										<noscript class="col-xs-offset-1 col-xs-10 big-spaced-vertical"><fmt:message key="javascript.yt.player" /></noscript>
+										<div id="noValid" class="col-xs-offset-1 col-xs-10 big-spaced-vertical center">
+											<p><fmt:message key="yt.player.no.valid.msg1" /><br /><fmt:message key="yt.player.no.valid.msg2" /></p>
+										</div>
+										<div id="playerBox">
+											<div id="player"></div>
+										</div>
+										<!-- End Player Box -->
+									</c:when>
+									<c:otherwise>
+										<div class="col-xs-offset-1 col-xs-10 big-spaced-vertical center">
+											<p><fmt:message key="yt.player.empty.msg1" /><br /><fmt:message key="yt.player.empty.msg2" /></p>
+										</div>
+									</c:otherwise>
+								</c:choose>
 							</div>
 							<div class="panel-footer">
+								<!-- Player Controls -->
 								<div id="playerControls" class="pager unselectable">
 									<div id="ytVideoArtistTitle" class="col-xs-8"></div>
 									<div id="ytVideoTimes" class="col-xs-4"><span id="ytCurrentTime"></span> / <span id="ytDuration"></span></div>
@@ -118,6 +150,7 @@
 										<div class="fixHeight"></div>
 									</div>
 								</div>
+								<!-- End Player Controls -->
 							</div>
 						</div>
 					</div>
@@ -126,33 +159,25 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- YouTube IFrame -->
 	<script src="//www.youtube.com/iframe_api"></script>
 	<!-- YouTube Player JavaScript -->
 	<script>
-		// Recupere le message
-		var allVideo = "<fmt:message key='yt.player.all.videos' />";
-		// Liste des videos
+		const allVideo = '<fmt:message key="yt.player.all.videos" />';
 		var videos = [
-		<%
-			if (listVideo != null && listVideo.size() > 0) {
-			    int first = 0;
-		    	for (YouTubeVideo video : listVideo) {
-		    	    if (first != 0) {
-		    			out.print(", ");
-		    	    }
-		    	    out.print("['" + video.getId() + "', '" + video.getPlaylistId() + "', '" + GlobalTools.formattedYTTitle(video.getTitle()) + "']");
-		    	    first++;
-		    	}
-			}
-		%>
-		];
+		    <c:if test="${not empty requestScope.listVideo}">
+		    	<c:forEach items="${requestScope.listVideo}" var="video" varStatus="loop">
+		    		<c:if test="${not loop.first}">, </c:if>
+		    		["${video.id}", "${video.playlistId}", "${video.youtubeTitle}"]
+		    	</c:forEach>
+		    </c:if>
+			];
     </script>
-    <script src="<%=path%>/js/youtube/player.js"></script>
+    <script src="${pageContext.request.contextPath}/js/youtube/player.js"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

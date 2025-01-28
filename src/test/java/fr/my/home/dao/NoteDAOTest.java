@@ -22,19 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe NoteDAOTest qui teste le stockage des notes
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class NoteDAOTest {
 
-	// Attributs
-	private NoteDAO noteDAO;
-	private Timestamp ts;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private NoteDAO noteDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public NoteDAOTest() {
 		super();
 		noteDAO = new NoteDAO();
-		ts = Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class NoteDAOTest {
 	 */
 	@Test
 	public void getOneNoteOk() {
-		Note note = new Note(1, "title", "message", ts);
+		Note note = new Note(1, "title", "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			noteDAO.add(note);
 			note = noteDAO.getOneNote(note.getId(), 1);
@@ -98,23 +101,21 @@ public class NoteDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		Note note = null;
+		boolean valid = false;
+		Note note = new Note(1, "title", "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			note = new Note(1, "title", "message", ts);
-			id = noteDAO.add(note);
+			noteDAO.add(note);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					noteDAO.delete(note);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				noteDAO.delete(note);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -122,14 +123,19 @@ public class NoteDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		Note note = new Note(1, null, "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			Note note = new Note(1, null, null, null);
-			id = noteDAO.add(note);
+			noteDAO.add(note);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				noteDAO.delete(note);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -138,9 +144,9 @@ public class NoteDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		Note note = new Note(1, "title", "message", ts);
+		Note note = new Note(1, "title", "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = noteDAO.add(note);
+			noteDAO.add(note);
 			try {
 				note.setMessage("anotherMessage");
 				noteDAO.update(note);
@@ -148,12 +154,10 @@ public class NoteDAOTest {
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						noteDAO.delete(note);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					noteDAO.delete(note);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -168,21 +172,21 @@ public class NoteDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		Note note = new Note(1, "Title", "Message", ts);
+		Note note = new Note(1, "title", "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = noteDAO.add(note);
+			noteDAO.add(note);
 			try {
-				note.setMessage(null);
+				note.setTitle(null);
 				noteDAO.update(note);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						noteDAO.delete(note);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					note.setTitle("title");
+					noteDAO.delete(note);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -197,7 +201,7 @@ public class NoteDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		Note note = new Note(1, "uniqueTitle", "message", ts);
+		Note note = new Note(1, "title", "message", Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			noteDAO.add(note);
 			noteDAO.delete(note);

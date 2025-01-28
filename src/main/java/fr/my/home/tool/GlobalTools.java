@@ -4,17 +4,21 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
@@ -30,27 +34,28 @@ import fr.my.home.bean.api.ObjectIPAPI;
 import fr.my.home.bean.api.ObjectReCaptcha;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.tool.properties.Settings;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Classe regroupant différents outils (formatDateToString / formattedYTTitle / validLanguage / getMaxRows / capitalizeFirstLetters / hash / getHtml /
- * postHtml / getObjectIPAPI / getObjectReCaptcha / checkReCaptcha / send Email)
+ * Classe GlobalTools regroupant différents outils
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class GlobalTools {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(GlobalTools.class);
-
-	// Attributes
-
+	private static final String HASH_SALT = Settings.getStringProperty("global.hash.salt");
 	private static final String SMTP_HOSTNAME = Settings.getStringProperty("smtp.hostname");
 	private static final int SMTP_PORT = Settings.getIntProperty("smtp.port");
 	private static final boolean SMTP_SSL = Settings.getBooleanProperty("smtp.ssl");
 	private static final String SMTP_USER = Settings.getStringProperty("smtp.user");
 	private static final String SMTP_PASS = Settings.getStringProperty("smtp.pass");
-
-	// Methods
 
 	/**
 	 * Format LocalDateTime to String "yyyy-MM-ddTHH:mm"
@@ -87,12 +92,96 @@ public class GlobalTools {
 	}
 
 	/**
-	 * Return the default actual timestamp
+	 * Format Weight to String (octets/ko/Mo/Go)
 	 * 
+	 * @param weight
+	 * @return String
+	 */
+	public static String formatWeightToString(long weight) {
+		String formattedWeight;
+		DecimalFormat formatter = new DecimalFormat("#.00");
+		if (weight <= 0) {
+			formattedWeight = "0 octet";
+		} else if (weight == 1) {
+			formattedWeight = "1 octet";
+		} else if (weight < 1024) {
+			formattedWeight = String.valueOf(weight) + " octets";
+		} else if (weight < (1024 * 1024)) {
+			formattedWeight = String.valueOf(formatter.format((double) weight / 1024)) + " ko";
+		} else if (weight < (1024 * 1024 * 1024)) {
+			formattedWeight = String.valueOf(formatter.format((double) weight / (1024 * 1024))) + " Mo";
+		} else {
+			formattedWeight = String.valueOf(formatter.format((double) weight / (1024 * 1024 * 1024))) + " Go";
+		}
+		return formattedWeight;
+	}
+
+	/**
+	 * Vérifie que le timestamp est valide et supérieur à l'année 2000
+	 * 
+	 * @param value
+	 * @param defaultDuration
 	 * @return Timestamp
 	 */
-	public static Timestamp defaultTimestamp() {
-		return Timestamp.valueOf(LocalDateTime.now());
+	public static Timestamp getFrom(String value, long defaultDuration) {
+		LocalDateTime now = LocalDateTime.now();
+		Timestamp from = Timestamp.valueOf(now);
+		try {
+			from.setTime(Long.parseLong(value));
+			// Vérifie que la date est > 2000
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(from);
+			int year = cal.get(Calendar.YEAR);
+			if (year < 2000) {
+				throw new NumberFormatException();
+			}
+		} catch (NumberFormatException nfe) {
+			from = Timestamp.valueOf(now.minusMonths(defaultDuration));
+		}
+		return from;
+	}
+
+	/**
+	 * Vérifie que le timestamp est valide et inférieur à l'année 2200
+	 * 
+	 * @param value
+	 * @return Timestamp
+	 */
+	public static Timestamp getTo(String value) {
+		LocalDateTime now = LocalDateTime.now();
+		Timestamp to = Timestamp.valueOf(now);
+		try {
+			to.setTime(Long.parseLong(value));
+			// Vérifie que la date est < 2200
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(to);
+			int year = cal.get(Calendar.YEAR);
+			if (year > 2200) {
+				throw new NumberFormatException();
+			}
+		} catch (NumberFormatException nfe) {
+			to = Timestamp.valueOf(now);
+		}
+		return to;
+	}
+
+	/**
+	 * Encode une chaine de caractères en latin
+	 * 
+	 * @param value
+	 * @return String
+	 */
+	public static String encodeLatin(String value) {
+		String result = "";
+		final Pattern patern = Pattern.compile("[^\\p{IsLatin}\\p{Digit}\\p{Space}\\p{Punct}]+");
+		if (value != null && !value.trim().isEmpty()) {
+			// Normalisation Unicode pour gérer les caractères combinés
+			String normalized = Normalizer.normalize(value, Normalizer.Form.NFD);
+			// Suppression des caractères non latins, chiffres, espaces et ponctuation
+			Matcher matcher = patern.matcher(normalized);
+			result = matcher.replaceAll("").trim();
+		}
+		return result;
 	}
 
 	/**
@@ -104,7 +193,7 @@ public class GlobalTools {
 	public static String formattedYTTitle(String title) {
 		String formattedYTTitle = null;
 		if (title != null && !title.trim().isEmpty()) {
-			formattedYTTitle = title.trim().replace('\'', '\"');
+			formattedYTTitle = title.trim().replace('\"', '\'');
 		}
 		return formattedYTTitle;
 	}
@@ -163,22 +252,29 @@ public class GlobalTools {
 	}
 
 	/**
-	 * Permet de hasher un string en MD5
+	 * Permet de hasher un string en SHA-256
 	 * 
-	 * @param rawStr
+	 * @param value
 	 * @return String
 	 * @throws FonctionnalException
 	 */
-	public static String hash(String rawStr) throws FonctionnalException {
-		String hash;
-		MessageDigest md;
+	public static String hash256(String value) throws FonctionnalException {
+		String hash = null;
 		try {
-			md = MessageDigest.getInstance("MD5");
-			byte[] messageDigest = md.digest(rawStr.getBytes());
-			BigInteger number = new BigInteger(1, messageDigest);
-			hash = number.toString(16);
-		} catch (NoSuchAlgorithmException nsaex) {
-			String error = "Erreur de cryptage";
+			value = HASH_SALT + value;
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hashBytes = md.digest(value.getBytes());
+			StringBuilder hexString = new StringBuilder();
+			for (byte b : hashBytes) {
+				String hex = Integer.toHexString(0xff & b);
+				if (hex.length() == 1) {
+					hexString.append('0');
+				}
+				hexString.append(hex);
+			}
+			hash = hexString.toString();
+		} catch (Exception ex) {
+			String error = "Erreur de cryptage SHA-256";
 			logger.error(error);
 			throw new FonctionnalException(error);
 		}
@@ -191,12 +287,13 @@ public class GlobalTools {
 	 * @param urlToRead
 	 * @return String
 	 * @throws IOException
+	 * @throws URISyntaxException
 	 */
-	public static String getHTML(String urlToRead) throws IOException {
+	public static String getHTML(String urlToRead) throws IOException, URISyntaxException {
 		StringBuilder result = new StringBuilder();
 
 		// Récupère l'url et ouvre la connexion
-		URL url = new URL(urlToRead);
+		URL url = new URI(urlToRead).toURL();
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 		// Ajoute le header request
@@ -220,12 +317,13 @@ public class GlobalTools {
 	 *            request-url => url POST / user-agent => headers / accept-language => headers / content => body content
 	 * @return string
 	 * @throws IOException
+	 * @throws URISyntaxException
 	 */
-	protected static String postHTML(HashMap<String, String> hmap) throws IOException {
+	protected static String postHTML(HashMap<String, String> hmap) throws IOException, URISyntaxException {
 		StringBuilder result = new StringBuilder();
 
 		// Récupère l'url et ouvre la connexion
-		URL url = new URL(hmap.get("request-url"));
+		URL url = new URI(hmap.get("request-url")).toURL();
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 		// Ajoute les headers request
@@ -311,7 +409,6 @@ public class GlobalTools {
 		try {
 			// Récupère le code HTML de la réponse de reCaptcha
 			String reponseAPI = GlobalTools.postHTML(hmap);
-			System.out.println("DEBUG: " + reponseAPI);
 
 			// Parse la réponse JSON en ObjectReCaptcha
 			ObjectReCaptcha objectReCaptcha = getObjectReCaptcha(reponseAPI);
@@ -321,7 +418,7 @@ public class GlobalTools {
 				}
 				logger.debug("ReCaptcha : " + objectReCaptcha.toString());
 			}
-		} catch (IOException | JsonSyntaxException e) {
+		} catch (IOException | JsonSyntaxException | URISyntaxException ex) {
 			logger.error("Impossible de vérifier le reCaptcha");
 		}
 
@@ -359,6 +456,23 @@ public class GlobalTools {
 			ee.printStackTrace();
 			logger.error("Erreur lors de l'envoi de l'email à " + target);
 		}
+	}
+
+	/**
+	 * Génère une chaine de caractères aléatoires
+	 * 
+	 * @param length
+	 * @return String
+	 */
+	public static String generateRandomString(int length) {
+		final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		SecureRandom random = new SecureRandom();
+		StringBuilder sb = new StringBuilder(length);
+		for (int i = 0; i < length; i++) {
+			int index = random.nextInt(characters.length());
+			sb.append(characters.charAt(index));
+		}
+		return sb.toString();
 	}
 
 }

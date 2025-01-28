@@ -2,23 +2,17 @@ package fr.my.home.servlet.health;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.my.home.bean.Sport;
 import fr.my.home.bean.User;
-import fr.my.home.bean.jsp.ViewAttribut;
-import fr.my.home.bean.jsp.ViewJSP;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
 import fr.my.home.exception.health.sports.ActivityException;
@@ -28,35 +22,39 @@ import fr.my.home.exception.health.sports.NotExistException;
 import fr.my.home.manager.SportsManager;
 import fr.my.home.tool.GlobalTools;
 import fr.my.home.tool.properties.Messages;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet qui prends en charge la gestion des activités sportives
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @WebServlet("/health/sports")
 public class SportsServlet extends HttpServlet {
-	private static final long serialVersionUID = 930448801449184468L;
-	private static final Logger logger = LogManager.getLogger(SportsServlet.class);
-
-	// Attributes
-
-	private SportsManager sportMgr;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
+	 */
+
+	private static final long serialVersionUID = 930448801449184468L;
+	private static final Logger logger = LogManager.getLogger(SportsServlet.class);
+	private SportsManager sportMgr;
+
+	/**
+	 * Constructeur
 	 */
 	public SportsServlet() {
 		super();
 		// Initialisation du manager
 		sportMgr = new SportsManager();
 	}
-
-	// Methods
 
 	/**
 	 * Redirection vers la liste et la suppression des activités sportives
@@ -65,18 +63,15 @@ public class SportsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.info("--> Sport Servlet [GET] -->");
 
-		// Création de la view renvoyée à la JSP
-		ViewJSP view = new ViewJSP();
-
 		// Récupère l'attribut erreur si il existe
 		String error = (String) request.getSession().getAttribute("error");
 		request.getSession().removeAttribute("error");
-		view.addAttributeToList(new ViewAttribut("error", error));
+		request.setAttribute("error", error);
 
 		// Récupère l'attribut success si il existe
 		String success = (String) request.getSession().getAttribute("success");
 		request.getSession().removeAttribute("success");
-		view.addAttributeToList(new ViewAttribut("success", success));
+		request.setAttribute("success", success);
 
 		// Récupère l'ID de l'utilisateur en session
 		int userId = ((User) request.getSession().getAttribute("user")).getId();
@@ -86,12 +81,12 @@ public class SportsServlet extends HttpServlet {
 
 		// Récupère le nombre de lignes max d'un tableau à afficher (pour traitement javascript)
 		int maxRows = GlobalTools.getMaxRows(request);
-		view.addAttributeToList(new ViewAttribut("maxRows", maxRows));
+		request.setAttribute("maxRows", maxRows);
 
-		// Récupère la date / heure actuelle en string et la charge dans la view
+		// Récupère la date / heure actuelle en string et la charge dans la requête
 		LocalDateTime now = LocalDateTime.now();
 		String today = GlobalTools.formatDateToString(now);
-		view.addAttributeToList(new ViewAttribut("today", today));
+		request.setAttribute("today", today);
 
 		// Récupère les paramètres de la requête
 		String action = request.getParameter("action");
@@ -102,22 +97,13 @@ public class SportsServlet extends HttpServlet {
 		} catch (NumberFormatException e) {
 			sportId = 0;
 		}
-		// Récupère les dates de la période voulue et les charge dans la view
-		Timestamp from = Timestamp.valueOf(now);
-		Timestamp to = Timestamp.valueOf(now);
-		try {
-			from.setTime(Long.parseLong(request.getParameter("from")));
+		// Récupère les dates de la période voulue et les charge dans la requête
+		Timestamp from = GlobalTools.getFrom(request.getParameter("from"), 3L);
+		Timestamp to = GlobalTools.getTo(request.getParameter("to"));
+		request.setAttribute("from", GlobalTools.formatDateToString(from.toLocalDateTime()));
+		request.setAttribute("to", GlobalTools.formatDateToString(to.toLocalDateTime()));
 
-		} catch (NumberFormatException nfe) {
-			from = Timestamp.valueOf(now.minusMonths(3L));
-		}
-		try {
-			to.setTime(Long.parseLong(request.getParameter("to")));
-		} catch (NumberFormatException nfe) {
-			to = Timestamp.valueOf(now);
-		}
-		view.addAttributeToList(new ViewAttribut("from", GlobalTools.formatDateToString(from.toLocalDateTime())));
-		view.addAttributeToList(new ViewAttribut("to", GlobalTools.formatDateToString(to.toLocalDateTime())));
+		// Récupère l'ordre de tri et le sens
 		String orderBy = request.getParameter("order-by");
 		String dir = request.getParameter("dir");
 
@@ -136,18 +122,18 @@ public class SportsServlet extends HttpServlet {
 				// Si action lister
 				case "list":
 					// Renvoi à la liste des activités sportives
-					redirectToSportsList(request, response, view, userId, from, to, orderBy, dir, lang);
+					redirectToSportsList(request, response, userId, from, to, orderBy, dir, lang);
 					break;
 				// Si action non reconnu
 				default:
 					// Renvoi à la liste des activités sportives
-					redirectToSportsList(request, response, view, userId, from, to, null, null, lang);
+					redirectToSportsList(request, response, userId, from, to, null, null, lang);
 					break;
 			}
 		} else {
 			// Si paramètre action non renseigné
 			// Renvoi à la liste des activités sportives
-			redirectToSportsList(request, response, view, userId, from, to, null, null, lang);
+			redirectToSportsList(request, response, userId, from, to, null, null, lang);
 		}
 	}
 
@@ -206,7 +192,7 @@ public class SportsServlet extends HttpServlet {
 			// Supprime l'activité sportive
 			sportMgr.deleteSport(sport);
 
-			// Ajoute le message de succès dans la view
+			// Ajoute le message de succès dans la requête
 			request.getSession().setAttribute("success", Messages.getProperty("success.sport.delete", lang));
 		} catch (FonctionnalException fex) {
 			if (fex instanceof NotExistException) {
@@ -225,7 +211,6 @@ public class SportsServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @param userId
 	 * @param from
 	 * @param to
@@ -235,8 +220,8 @@ public class SportsServlet extends HttpServlet {
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	private void redirectToSportsList(HttpServletRequest request, HttpServletResponse response, ViewJSP view, int userId, Timestamp from,
-			Timestamp to, String orderBy, String dir, String lang) throws ServletException, IOException {
+	private void redirectToSportsList(HttpServletRequest request, HttpServletResponse response, int userId, Timestamp from, Timestamp to,
+			String orderBy, String dir, String lang) throws ServletException, IOException {
 		List<Sport> listSport = null;
 		try {
 			// Récupère la liste des activités sportives de l'utilisateur
@@ -246,12 +231,17 @@ public class SportsServlet extends HttpServlet {
 			listSport = sportMgr.orderBy(listSport, orderBy, dir);
 
 		} catch (TechnicalException tex) {
-			view.addAttributeToList(new ViewAttribut("error", Messages.getProperty("error.database", lang)));
+			request.setAttribute("error", Messages.getProperty("error.database", lang));
 		}
-		// Ajoute la liste dans la view
-		view.addAttributeToList(new ViewAttribut("listSport", listSport));
+		// Prépare la liste inversée pour le graphique JS
+		List<Sport> jsListSport = new ArrayList<Sport>(listSport);
+		Collections.reverse(jsListSport);
+		// Ajoute les attributs à la requête
+		request.setAttribute("listSport", listSport);
+		request.setAttribute("jsListSport", jsListSport);
+		request.setAttribute("formatterDate", new SimpleDateFormat("dd/MM/yyyy - HH:mm"));
 		// Redirection
-		redirectToSportJSP(request, response, view);
+		redirectToSportJSP(request, response);
 	}
 
 	/**
@@ -259,17 +249,13 @@ public class SportsServlet extends HttpServlet {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param view
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	private void redirectToSportJSP(HttpServletRequest request, HttpServletResponse response, ViewJSP view) throws ServletException, IOException {
-		// Charge la view dans la requête
-		request.setAttribute("view", view);
-
+	private void redirectToSportJSP(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Redirige vers la JSP
 		logger.info(" --> Sport JSP --> ");
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/health/sport/sport.jsp");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/health/sports.jsp");
 		dispatcher.forward(request, response);
 	}
 

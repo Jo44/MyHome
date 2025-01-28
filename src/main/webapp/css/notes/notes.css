@@ -15,7 +15,12 @@
 .areaNicEdit {
 	color: black;
 	background-color: #888;
-	cursor: pointer;
+	cursor: default;
+}
+
+.nicEdit-main {
+	padding: 2px 5px;
+	text-align: left;
 }
 
 #areaComment {
@@ -23,7 +28,6 @@
 	margin-bottom: 20px;
 	width: 100%;
 	resize: vertical;
-	text-align: left;
 }
 
 .nicEdit-pane {

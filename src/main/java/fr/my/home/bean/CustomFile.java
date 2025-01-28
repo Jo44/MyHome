@@ -1,117 +1,82 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import fr.my.home.tool.GlobalTools;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean CustomFile que peut uploader/downloader un utilisateur
+ * Bean CustomFile
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "file")
-public class CustomFile implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private int idUser;
-	private String name;
-	private long weight;
-	private Timestamp uploadDate;
-
-	// Constructors
+@Table(name = "files")
+public class CustomFile {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public CustomFile() {
-		super();
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param idUser
-	 * @param name
-	 * @param weight
-	 * @param uploadDate
-	 */
-	public CustomFile(int idUser, String name, long weight, Timestamp uploadDate) {
-		this();
-		this.idUser = idUser;
-		this.name = name;
-		this.weight = weight;
-		this.uploadDate = uploadDate;
-	}
-
-	// Methods
-
-	/**
-	 * To String
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , User: ");
-		sb.append(String.valueOf(idUser));
-		sb.append(" , Name: ");
-		if (name != null) {
-			sb.append(name);
-		} else {
-			sb.append("null");
-		}
-		sb.append(" , Weight: ");
-		sb.append(String.valueOf(weight));
-		sb.append(" , Upload Date: ");
-		if (uploadDate != null) {
-			sb.append(uploadDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
 
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "file_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "id_user", nullable = false)
+	private int id_user;
+	@Column(name = "name", nullable = false)
+	private String name;
+	@Column(name = "weight", nullable = false)
+	private long weight;
+	@Column(name = "upload_date", nullable = false)
+	private Timestamp upload_date;
+
+	/**
+	 * Constructeur
+	 */
+	public CustomFile() {}
+
+	/**
+	 * Constructeur
+	 * 
+	 * @param id_user
+	 * @param name
+	 * @param weight
+	 * @param upload_date
+	 */
+	public CustomFile(int id_user, String name, long weight, Timestamp upload_date) {
+		this.id_user = id_user;
+		this.name = name;
+		this.weight = weight;
+		this.upload_date = upload_date;
+	}
+
+	/**
+	 * Getters/Setters
+	 */
+
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "file_id_user")
 	public int getIdUser() {
-		return idUser;
+		return id_user;
 	}
 
-	@SuppressWarnings("unused")
-	private void setIdUser(int idUser) {
-		this.idUser = idUser;
+	public void setIdUser(int id_user) {
+		this.id_user = id_user;
 	}
 
-	@Column(name = "file_name")
 	public String getName() {
 		return name;
 	}
@@ -120,24 +85,24 @@ public class CustomFile implements Serializable {
 		this.name = name;
 	}
 
-	@Column(name = "file_weight")
 	public long getWeight() {
 		return weight;
 	}
 
-	@SuppressWarnings("unused")
-	private void setWeight(long weight) {
+	public String getFormattedWeight() {
+		return GlobalTools.formatWeightToString(weight);
+	}
+
+	public void setWeight(long weight) {
 		this.weight = weight;
 	}
 
-	@Column(name = "file_upload_date")
 	public Timestamp getUploadDate() {
-		return uploadDate;
+		return upload_date;
 	}
 
-	@SuppressWarnings("unused")
-	private void setUploadDate(Timestamp uploadDate) {
-		this.uploadDate = uploadDate;
+	public void setUploadDate(Timestamp upload_date) {
+		this.upload_date = upload_date;
 	}
 
 }

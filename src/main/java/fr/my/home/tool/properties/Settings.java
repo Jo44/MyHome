@@ -9,17 +9,17 @@ import org.apache.logging.log4j.Logger;
  * Classe en charge de récupérer en mémoire les paramètres de l'application via un fichier 'settings.properties'
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class Settings {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(Settings.class);
-
-	// Attributes
-
 	private static Properties properties;
-
-	// Methods
 
 	/**
 	 * Charge le fichier 'settings.properties'
@@ -35,25 +35,47 @@ public class Settings {
 		}
 	}
 
-	// Getters
-
+	/**
+	 * Retourne la valeur (String)
+	 * 
+	 * @param key
+	 * @return String
+	 */
 	public static String getStringProperty(String key) {
 		String parametre = properties.getProperty(key, null);
 		return parametre;
 	}
 
+	/**
+	 * Retourne la valeur (int)
+	 * 
+	 * @param key
+	 * @return int
+	 */
 	public static int getIntProperty(String key) {
 		String parametreStr = properties.getProperty(key, null);
 		int parametre = Integer.parseInt(parametreStr);
 		return parametre;
 	}
 
+	/**
+	 * Retourne la valeur (long)
+	 * 
+	 * @param key
+	 * @return long
+	 */
 	public static long getLongProperty(String key) {
 		String parametreStr = properties.getProperty(key, null);
 		long parametre = Long.parseLong(parametreStr);
 		return parametre;
 	}
 
+	/**
+	 * Retourne la valeur (boolean)
+	 * 
+	 * @param key
+	 * @return boolean
+	 */
 	public static boolean getBooleanProperty(String key) {
 		String parametreStr = properties.getProperty(key, null);
 		boolean parametre = Boolean.parseBoolean(parametreStr);

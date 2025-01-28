@@ -2,38 +2,41 @@ package fr.my.home.filter;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.my.home.bean.User;
 import fr.my.home.manager.UsersManager;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Filtre qui permet de vérifier si un utilisateur est bien authentifié pour accèder à la ressource demandée
  * 
  * @author Jonathan
  * @version 1.1
- * @since 07/08/2021
+ * @since 15/01/2025
  */
 public class AuthentificationFilter implements Filter {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final Logger logger = LogManager.getLogger(AuthentificationFilter.class);
 
-	// Initialisation
-
+	/**
+	 * Initialisation
+	 */
 	@Override
 	public void init(FilterConfig fc) throws ServletException {}
-
-	// Filter
 
 	/**
 	 * Filter
@@ -49,7 +52,6 @@ public class AuthentificationFilter implements Filter {
 		HttpServletRequest hsreq = (HttpServletRequest) request;
 		HttpServletResponse hsres = (HttpServletResponse) response;
 		HttpSession session = hsreq.getSession(true);
-
 		// Récupère l'url d'accès des servlets ne nécessitant pas de connexion utilisateur
 		// Servlet de login
 		String loginURI = hsreq.getContextPath() + "/check";
@@ -63,10 +65,8 @@ public class AuthentificationFilter implements Filter {
 		String recoveryURI = hsreq.getContextPath() + "/recovery";
 		// Servlet de modification d'un mot de passe
 		String reinitURI = hsreq.getContextPath() + "/reinit";
-
 		// Récupère l'url demandée actuellement
 		String requestURI = hsreq.getRequestURI();
-
 		User user = null;
 		boolean loggedIn = false;
 		boolean loginRequest = requestURI.equals(loginURI);
@@ -75,7 +75,6 @@ public class AuthentificationFilter implements Filter {
 		boolean validationRequest = requestURI.equals(validationURI);
 		boolean recoveryRequest = requestURI.equals(recoveryURI);
 		boolean reinitRequest = requestURI.equals(reinitURI);
-
 		// Détermine si l'utilisateur est présent en session
 		if (session != null) {
 			user = (User) session.getAttribute("user");
@@ -93,7 +92,6 @@ public class AuthentificationFilter implements Filter {
 				}
 			}
 		}
-
 		// Laisse passer la requête si utilisateur déjà connecté, si url autorisée ou toutes ressources css/js/png/ico/fonts
 		if (loggedIn || loginRequest || statusRequest || registerRequest || validationRequest || recoveryRequest || reinitRequest
 				|| requestURI.endsWith(".css") || requestURI.endsWith(".js") || requestURI.endsWith(".png") || requestURI.endsWith(".ico")
@@ -108,8 +106,9 @@ public class AuthentificationFilter implements Filter {
 		}
 	}
 
-	// Destroy
-
+	/**
+	 * Destroy
+	 */
 	@Override
 	public void destroy() {}
 

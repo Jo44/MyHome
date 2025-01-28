@@ -1,124 +1,95 @@
 package fr.my.home.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
- * Bean Weight que peut enregistrer un utilisateur
+ * Bean Weight
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 @Entity
-@Table(name = "weight")
-public class Weight implements Serializable {
-	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
-	private int id;
-	private int idUser;
-	private float value;
-	private Timestamp saveDate;
-
-	// Constructors
+@Table(name = "weights")
+public class Weight {
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public Weight() {
-		super();
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param idUser
-	 * @param value
-	 * @param saveDate
-	 */
-	public Weight(int idUser, float value, Timestamp saveDate) {
-		this();
-		this.idUser = idUser;
-		this.value = value;
-		this.saveDate = saveDate;
-	}
-
-	// Methods
-
-	/**
-	 * To String
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ID: ");
-		sb.append(String.valueOf(id));
-		sb.append(" , User: ");
-		sb.append(String.valueOf(idUser));
-		sb.append(" , Value: ");
-		sb.append(String.valueOf(value));
-		sb.append(" , Save Date: ");
-		if (saveDate != null) {
-			sb.append(saveDate.toString());
-		} else {
-			sb.append("null");
-		}
-		sb.append(" }");
-		return sb.toString();
-	}
-
-	// Getters/Setters (setters en privé car seulement utilisé par Hibernate)
 
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
-	@Column(name = "weight_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@Column(name = "id_user", nullable = false)
+	private int id_user;
+	@Column(name = "value", nullable = false)
+	private float value;
+	@Column(name = "save_date", nullable = false)
+	private Timestamp save_date;
+
+	/**
+	 * Constructeur
+	 */
+	public Weight() {}
+
+	/**
+	 * Constructeur
+	 * 
+	 * @param id_user
+	 * @param value
+	 * @param save_date
+	 */
+	public Weight(int id_user, float value, Timestamp save_date) {
+		this.id_user = id_user;
+		this.value = value;
+		this.save_date = save_date;
+	}
+
+	/**
+	 * Getters/Setters
+	 */
+
 	public int getId() {
 		return id;
 	}
 
-	@SuppressWarnings("unused")
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	@Column(name = "weight_id_user")
 	public int getIdUser() {
-		return idUser;
+		return id_user;
 	}
 
-	@SuppressWarnings("unused")
-	private void setIdUser(int idUser) {
-		this.idUser = idUser;
+	public void setIdUser(int id_user) {
+		this.id_user = id_user;
 	}
 
-	@Column(name = "weight_value")
 	public float getValue() {
 		return value;
 	}
 
-	@SuppressWarnings("unused")
-	private void setValue(float value) {
+	public void setValue(float value) {
 		this.value = value;
 	}
 
-	@Column(name = "weight_save_date")
 	public Timestamp getSaveDate() {
-		return saveDate;
+		return save_date;
 	}
 
-	public void setSaveDate(Timestamp saveDate) {
-		this.saveDate = saveDate;
+	public String getSaveDateJS() {
+		return save_date.toLocalDateTime().toString();
+	}
+
+	public void setSaveDate(Timestamp save_date) {
+		this.save_date = save_date;
 	}
 
 }

@@ -22,19 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe ContactDAOTest qui teste le stockage des contacts
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class ContactDAOTest {
 
-	// Attributs
-	private ContactDAO contactDAO;
-	private Timestamp ts;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private ContactDAO contactDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public ContactDAOTest() {
 		super();
 		contactDAO = new ContactDAO();
-		ts = Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	/**
@@ -68,7 +71,8 @@ public class ContactDAOTest {
 	 */
 	@Test
 	public void getOneContactOk() {
-		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter", ts);
+		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter",
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			contactDAO.add(contact);
 			contact = contactDAO.getOneContact(contact.getId(), 1);
@@ -98,23 +102,22 @@ public class ContactDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		Contact contact = null;
+		boolean valid = false;
+		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter",
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter", ts);
-			id = contactDAO.add(contact);
+			contactDAO.add(contact);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					contactDAO.delete(contact);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				contactDAO.delete(contact);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -122,14 +125,19 @@ public class ContactDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		Contact contact = new Contact(1, null, "lastname", "email@domain.com", "0600112233", "monTwitter", Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			Contact contact = new Contact(1, null, null, null, null, null, null);
-			id = contactDAO.add(contact);
+			contactDAO.add(contact);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				contactDAO.delete(contact);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -138,9 +146,10 @@ public class ContactDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter", ts);
+		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter",
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = contactDAO.add(contact);
+			contactDAO.add(contact);
 			try {
 				contact.setFirstname("anotherFirstname");
 				contactDAO.update(contact);
@@ -148,12 +157,10 @@ public class ContactDAOTest {
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						contactDAO.delete(contact);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					contactDAO.delete(contact);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -168,21 +175,22 @@ public class ContactDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		Contact contact = new Contact(1, "Jo", null, null, null, null, ts);
+		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter",
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = contactDAO.add(contact);
+			contactDAO.add(contact);
 			try {
 				contact.setFirstname(null);
 				contactDAO.update(contact);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						contactDAO.delete(contact);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					contact.setFirstname("firstname");
+					contactDAO.delete(contact);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -197,7 +205,8 @@ public class ContactDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter", ts);
+		Contact contact = new Contact(1, "firstname", "lastname", "email@domain.com", "0600112233", "monTwitter",
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			contactDAO.add(contact);
 			contactDAO.delete(contact);

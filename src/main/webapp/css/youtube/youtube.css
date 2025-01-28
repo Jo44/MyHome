@@ -9,19 +9,51 @@
 	padding-right: 5%;
 }
 
+#infoBox {
+	padding: 20px 50px;
+}
+
 #playerBox {
 	background-color: black;
+}
+
+/************************/
+/**** YouTube Iframe ****/
+/************************/
+
+/* Resolution Small */
+iframe#player {
+	height: 320px;
+	width: 100%;
+}
+
+/* Resolution HD */
+@media (min-height: 721px) {
+	iframe#player {
+		height: 620px;
+		width: 100%;
+	}
+}
+
+/* Resolution QHD */
+@media (min-height: 1081px) {
+	iframe#player {
+		height: 990px;
+		width: 100%;
+	}
+}
+
+/* Resolution UHD */
+@media (min-height: 1441px) {
+	iframe#player {
+		height: 1250px;
+		width: 100%;
+	}
 }
 
 /* Error */
 .alert-player, #noValid {
 	display: none;
-}
-
-/* Player Header */
-#headerTitle, #headerButton {
-	margin-top: 2px;
-	margin-bottom: 2px;
 }
 
 /* Header */
@@ -37,6 +69,15 @@
 }
 
 /* Select */
+#selectPlayer {
+	display: flex;
+	justify-content: space-between;
+}
+
+#selectPlayer > div {
+	display: inline-block;
+}
+
 #selectVideo, #selectPlaylist {
 	display: none;
 	background-color: #4b4b4b;
@@ -87,6 +128,7 @@
 
 input[type=range] {
 	-webkit-appearance: none;
+	appearance: none; 
 	width: 100%;
 	margin: 0px 0;
 	border: 0px solid black;
@@ -220,12 +262,6 @@ input[type=range]:focus::-ms-fill-upper {
 
 #displayPagination {
 	line-height: 26px;
-}
-
-/* Liens */
-#createYTAccount, #createYTAccount:hover {
-	text-decoration: none;
-	color: #bbb;
 }
 
 /* Radio custom */

@@ -22,19 +22,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe FileDAOTest qui teste le stockage des fichiers
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class FileDAOTest {
 
-	// Attributs
-	private FileDAO fileDAO;
-	private Timestamp ts;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private FileDAO fileDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public FileDAOTest() {
 		super();
 		fileDAO = new FileDAO();
-		ts = Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class FileDAOTest {
 	 */
 	@Test
 	public void getOneFileOk() {
-		CustomFile file = new CustomFile(1, "filename", 0, ts);
+		CustomFile file = new CustomFile(1, "filename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			fileDAO.add(file);
 			file = fileDAO.getOneFile(file.getId(), 1);
@@ -99,7 +102,7 @@ public class FileDAOTest {
 	@Test
 	public void checkOneFileByNameExist() {
 		boolean exist = false;
-		CustomFile file = new CustomFile(1, "uniqueFilename", 0, ts);
+		CustomFile file = new CustomFile(1, "uniqueFilename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			fileDAO.add(file);
 			exist = fileDAO.checkOneFileByName("uniqueFilename", 1);
@@ -129,23 +132,21 @@ public class FileDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		CustomFile file = null;
+		boolean valid = false;
+		CustomFile file = new CustomFile(1, "filename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			file = new CustomFile(1, "filename", 0, ts);
-			id = fileDAO.add(file);
+			fileDAO.add(file);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					fileDAO.delete(file);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				fileDAO.delete(file);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -153,14 +154,19 @@ public class FileDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		CustomFile file = new CustomFile(1, null, 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			CustomFile file = new CustomFile(1, null, 0, null);
-			id = fileDAO.add(file);
+			fileDAO.add(file);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				fileDAO.delete(file);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -169,9 +175,9 @@ public class FileDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		CustomFile file = new CustomFile(1, "filename", 0, ts);
+		CustomFile file = new CustomFile(1, "filename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = fileDAO.add(file);
+			fileDAO.add(file);
 			try {
 				file.setName("anotherFilename");
 				fileDAO.update(file);
@@ -179,12 +185,10 @@ public class FileDAOTest {
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						fileDAO.delete(file);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					fileDAO.delete(file);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -199,21 +203,21 @@ public class FileDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		CustomFile file = new CustomFile(1, "filename", 0, ts);
+		CustomFile file = new CustomFile(1, "filename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = fileDAO.add(file);
+			fileDAO.add(file);
 			try {
 				file.setName(null);
 				fileDAO.update(file);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						fileDAO.delete(file);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					file.setName("filename");
+					fileDAO.delete(file);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -228,7 +232,7 @@ public class FileDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		CustomFile file = new CustomFile(1, "filename", 0, ts);
+		CustomFile file = new CustomFile(1, "filename", 0, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			fileDAO.add(file);
 			fileDAO.delete(file);

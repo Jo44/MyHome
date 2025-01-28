@@ -6,21 +6,21 @@ import fr.my.home.exception.FonctionnalException;
  * Classe modèle d'une exception fonctionnelle de type : File - Fichier trop volumineux
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class FileSizeException extends FonctionnalException {
+
+	/**
+	 * Attributs
+	 */
+
 	private static final long serialVersionUID = 930448801449184468L;
-
-	// Attributes
-
 	private String message;
 	private String filename;
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
 	public FileSizeException(String message, String filename) {
 		super(message);
@@ -28,7 +28,9 @@ public class FileSizeException extends FonctionnalException {
 		this.filename = filename;
 	}
 
-	// Getters/Setters
+	/**
+	 * Getters/Setters
+	 */
 
 	@Override
 	public String getMessage() {

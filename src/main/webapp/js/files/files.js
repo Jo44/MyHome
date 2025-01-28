@@ -8,7 +8,7 @@
 
 // Affiche le detail de chaque fichier et determine si l'upload est valide ou non
 $('#fileInput').on('change', function() {
-	// Attribut
+	// Variables
 	var validFile = true;
 	var validRequest = true;
 	var totalRequestWeight = 0;

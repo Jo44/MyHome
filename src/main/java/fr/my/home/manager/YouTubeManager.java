@@ -3,12 +3,14 @@ package fr.my.home.manager;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.Playlist;
@@ -24,47 +26,45 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 
-import fr.my.home.bean.YouTubeActivPlaylist;
+import fr.my.home.bean.ActivePlaylist;
 import fr.my.home.bean.YouTubePlaylist;
 import fr.my.home.bean.YouTubeVideo;
-import fr.my.home.dao.implementation.YouTubePlaylistDAO;
+import fr.my.home.dao.implementation.PlaylistDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
 import fr.my.home.exception.youtube.playlists.CantDeleteActiveException;
 import fr.my.home.exception.youtube.playlists.DescriptionException;
 import fr.my.home.exception.youtube.playlists.TitleException;
-import fr.my.home.service.YouTubeService;
-import fr.my.home.tool.properties.Settings;
+import fr.my.home.tool.GlobalTools;
+import fr.my.home.tool.GoogleServices;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Manager qui prends en charge la gestion des playlists/vidéos YouTube
  * 
  * @author Jonathan
- * @version 1.0
- * @since 16/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class YouTubeManager {
-	private static final Logger logger = LogManager.getLogger(YouTubeManager.class);
-
-	// Attributes
-
-	private static final String PRIVATE_IMG = Settings.getStringProperty("yt.private");
-	private YouTube youtubeService;
-	private YouTubePlaylistDAO ytPlaylistDAO;
-
-	// Constructors
 
 	/**
-	 * Default Constructor
+	 * Attributs
 	 */
-	public YouTubeManager() {
-		// YouTube Data Service
-		youtubeService = YouTubeService.getYouTubeService();
-		// YouTube Active Playlist DAO
-		ytPlaylistDAO = new YouTubePlaylistDAO();
-	}
 
-	// Methods
+	private static final Logger logger = LogManager.getLogger(YouTubeManager.class);
+	private YouTube youtube;
+	private PlaylistDAO ytPlaylistDAO;
+
+	/**
+	 * Constructeur
+	 */
+	public YouTubeManager(HttpSession session) throws FonctionnalException, TechnicalException {
+		// YouTube Service
+		youtube = GoogleServices.getYouTubeService(session);
+		// YouTube Active Playlist DAO
+		ytPlaylistDAO = new PlaylistDAO();
+	}
 
 	/**
 	 * Renvoi la liste des playlists actives de l'utilisateur
@@ -73,8 +73,8 @@ public class YouTubeManager {
 	 * @return List<YouTubePlaylist>
 	 * @throws TechnicalException
 	 */
-	public List<YouTubeActivPlaylist> getActivePlaylists(int userId) throws TechnicalException {
-		List<YouTubeActivPlaylist> listActivePlayslist = new ArrayList<YouTubeActivPlaylist>();
+	public List<ActivePlaylist> getActivePlaylists(int userId) throws TechnicalException {
+		List<ActivePlaylist> listActivePlayslist = new ArrayList<ActivePlaylist>();
 		try {
 			// Récupère la liste des playlists actives
 			listActivePlayslist = ytPlaylistDAO.getAllActivePlaylists(userId);
@@ -93,8 +93,8 @@ public class YouTubeManager {
 	 * @return List<YouTubePlaylist>
 	 * @throws TechnicalException
 	 */
-	public List<YouTubeActivPlaylist> getPlaylists(int userId) throws TechnicalException {
-		List<YouTubeActivPlaylist> listPlaylist = new ArrayList<YouTubeActivPlaylist>();
+	public List<ActivePlaylist> getPlaylists(int userId) throws TechnicalException {
+		List<ActivePlaylist> listPlaylist = new ArrayList<ActivePlaylist>();
 		try {
 			// Récupère la liste des playlists
 			listPlaylist = ytPlaylistDAO.getAllPlaylists(userId);
@@ -114,8 +114,8 @@ public class YouTubeManager {
 	 * @return YouTubeActivPlaylist
 	 * @thorws TechnicalException
 	 */
-	public YouTubeActivPlaylist getPlaylist(int userId, String youtubeId) throws TechnicalException {
-		YouTubeActivPlaylist playlist = null;
+	public ActivePlaylist getPlaylist(int userId, String youtubeId) throws TechnicalException {
+		ActivePlaylist playlist = null;
 		try {
 			// Récupère la playlist
 			playlist = ytPlaylistDAO.getOnePlaylist(userId, youtubeId);
@@ -130,16 +130,17 @@ public class YouTubeManager {
 	/**
 	 * Vérifie si la playlist demandée appartient bien à l'utilisateur et renvoi boolean
 	 * 
+	 * @param idPlaylist
 	 * @param userId
 	 * @param youtubeId
 	 * @return boolean
 	 * @thorws TechnicalException
 	 */
-	public boolean checkPlaylist(int playlistId, int userId, String youtubeId) throws TechnicalException {
+	public boolean checkPlaylist(int idPlaylist, int userId, String youtubeId) throws TechnicalException {
 		boolean valid = false;
 		try {
 			// Récupère la playlist
-			YouTubeActivPlaylist playlist = ytPlaylistDAO.getOnePlaylist(userId, youtubeId);
+			ActivePlaylist playlist = ytPlaylistDAO.getOnePlaylist(userId, youtubeId);
 			logger.debug("Récupération de la playlist");
 			if (playlist != null) {
 				valid = true;
@@ -165,7 +166,7 @@ public class YouTubeManager {
 		String id = "";
 		try {
 			// Ajoute la nouvelle playlist
-			YouTubeActivPlaylist playlist = new YouTubeActivPlaylist(userId, youtubeId, active, Timestamp.valueOf(LocalDateTime.now()));
+			ActivePlaylist playlist = new ActivePlaylist(userId, youtubeId, active, Timestamp.valueOf(LocalDateTime.now()));
 			ytPlaylistDAO.add(playlist);
 			id = playlist.getIdYouTube();
 			logger.debug("Ajout d'une nouvelle playlist réussi");
@@ -187,7 +188,7 @@ public class YouTubeManager {
 	 * @throws FonctionnalException
 	 * @throws TechnicalException
 	 */
-	public void updatePlaylist(YouTubeActivPlaylist playlist, boolean active) throws FonctionnalException, TechnicalException {
+	public void updatePlaylist(ActivePlaylist playlist, boolean active) throws FonctionnalException, TechnicalException {
 		try {
 			// Modifie la playlist
 			playlist.setActive(active);
@@ -225,7 +226,7 @@ public class YouTubeManager {
 	 * @throws FonctionnalException
 	 * @throws TechnicalException
 	 */
-	public void deletePlaylist(YouTubeActivPlaylist playlist) throws FonctionnalException, TechnicalException {
+	public void deletePlaylist(ActivePlaylist playlist) throws FonctionnalException, TechnicalException {
 		logger.debug("Tentative de suppression d'une playlist en cours ..");
 		try {
 			// Vérifie si la playlist n'est pas celle qui est active, sinon renvoi exception fonctionnelle
@@ -246,36 +247,67 @@ public class YouTubeManager {
 	}
 
 	/**
-	 * YOUTUBE DATA
-	 */
-
-	/**
 	 * Récupère le channel ID de l'utilisateur
 	 * 
 	 * @return String
 	 */
 	private String getChannelIDYTData() {
 		String channelId = "";
-
 		try {
 			// Préparation des paramètres
-			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "id");
-			parameters.put("field", "items(id)");
+			List<String> parts = Collections.singletonList("id");
+			String field = "items(id)";
 
 			// Récupère le channel de l'utilisateur
-			YouTube.Channels.List channelsListMineCmd = youtubeService.channels().list(parameters.get("part").toString());
-			channelsListMineCmd.setMine(true);
-			channelsListMineCmd.setFields(parameters.get("field").toString());
-			ChannelListResponse channelListResponse = channelsListMineCmd.execute();
+			YouTube.Channels.List request = youtube.channels().list(parts);
+			request.setMine(true);
+			request.setFields(field);
 
-			// Renvoi le channel ID
-			channelId = channelListResponse.getItems().get(0).getId();
-		} catch (Throwable t) {
-			t.printStackTrace();
-			logger.error("YouTube Data - Impossible de récupérer le channel ID");
+			// Execute the request
+			ChannelListResponse response = request.execute();
+
+			if (response != null && response.getItems() != null && response.getItems().size() > 0) {
+				channelId = response.getItems().get(0).getId();
+			}
+		} catch (GoogleJsonResponseException jsonex) {
+			logger.error("YouTube Data - getChannelIDYTData - Impossible de parse la réponse : ", jsonex.getMessage());
+		} catch (Throwable th) {
+			th.printStackTrace();
+			logger.error("YouTube Data - getChannelIDYTData - Impossible de récupérer le channel ID");
 		}
 		return channelId;
+	}
+
+	/**
+	 * Récupère le nom de la chaine YouTube de l'utilisateur
+	 * 
+	 * @return String
+	 */
+	public String getChannelNameYTData() {
+		String channelName = "";
+		try {
+			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet");
+			String field = "items(snippet/title)";
+
+			// Récupère le channel de l'utilisateur
+			YouTube.Channels.List request = youtube.channels().list(parts);
+			request.setMine(true);
+			request.setFields(field);
+
+			// Execute the request
+			ChannelListResponse response = request.execute();
+
+			if (response != null && response.getItems() != null && response.getItems().size() > 0) {
+				channelName = response.getItems().get(0).getSnippet().getTitle();
+			}
+		} catch (GoogleJsonResponseException jsonex) {
+			logger.error("YouTube Data - getChannelNameYTData - Impossible de parse la réponse : ", jsonex.getMessage());
+		} catch (Throwable th) {
+			th.printStackTrace();
+			logger.error("YouTube Data - getChannelNameYTData - Impossible de récupérer le channel name");
+		}
+		return channelName;
 	}
 
 	/**
@@ -286,33 +318,32 @@ public class YouTubeManager {
 	 */
 	public List<YouTubePlaylist> getPlaylistsYTData(String pageToken) {
 		List<YouTubePlaylist> listPlaylist = new ArrayList<YouTubePlaylist>();
-
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet,status");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,status");
 			parameters.put("field",
 					"pageInfo(totalResults),nextPageToken,prevPageToken,items(id,snippet(publishedAt,title,description,thumbnails(default(url))),status(privacyStatus))");
-			parameters.put("maxResults", "10");
+			parameters.put("maxResults", "30");
 			parameters.put("channelId", getChannelIDYTData());
 			parameters.put("pageToken", pageToken);
 
 			if (parameters.get("channelId") != null || parameters.get("channelId") != "") {
 				// Récupère les playlists de l'utilisateur OAuth
-				YouTube.Playlists.List playlistsListByChannelIdCmd = youtubeService.playlists().list(parameters.get("part").toString());
-				playlistsListByChannelIdCmd.setChannelId(parameters.get("channelId").toString());
-				playlistsListByChannelIdCmd.setFields(parameters.get("field").toString());
-				playlistsListByChannelIdCmd.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
+				YouTube.Playlists.List request = youtube.playlists().list(parts);
+				request.setChannelId(parameters.get("channelId").toString());
+				request.setFields(parameters.get("field").toString());
+				request.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
 				if (parameters.containsKey("pageToken") && parameters.get("pageToken") != null && !parameters.get("pageToken").isEmpty()) {
-					playlistsListByChannelIdCmd.setPageToken(pageToken);
+					request.setPageToken(pageToken);
 				}
-				PlaylistListResponse playlistsListResponse = playlistsListByChannelIdCmd.execute();
-
+				// Execute the request
+				PlaylistListResponse response = request.execute();
 				// Récupère la pagination et la liste des playlists
-				List<Playlist> listPlaylistYTData = playlistsListResponse.getItems();
-				int totalResults = playlistsListResponse.getPageInfo().getTotalResults();
-				String prevPageToken = playlistsListResponse.getPrevPageToken();
-				String nextPageToken = playlistsListResponse.getNextPageToken();
+				List<Playlist> listPlaylistYTData = response.getItems();
+				int totalResults = response.getPageInfo().getTotalResults();
+				String prevPageToken = response.getPrevPageToken();
+				String nextPageToken = response.getNextPageToken();
 				// Récupère la pagination et la liste des playlist items
 
 				// Conversion en playlist
@@ -325,8 +356,8 @@ public class YouTubeManager {
 						String privacy = playlistYTData.getStatus().getPrivacyStatus();
 						Timestamp publishedAt = new Timestamp(playlistYTData.getSnippet().getPublishedAt().getValue());
 						// Ajoute la playlist à la liste
-						YouTubePlaylist playlist = new YouTubePlaylist(id, title, description, urlImage, privacy, false, publishedAt, totalResults,
-								prevPageToken, nextPageToken);
+						YouTubePlaylist playlist = new YouTubePlaylist(id, GlobalTools.encodeLatin(title), GlobalTools.encodeLatin(description),
+								urlImage, privacy, false, publishedAt, totalResults, prevPageToken, nextPageToken);
 						listPlaylist.add(playlist);
 					}
 				}
@@ -341,15 +372,13 @@ public class YouTubeManager {
 	/**
 	 * Récupère la playlist selon son ID
 	 * 
-	 * @param playlistId
+	 * @param idPlaylist
 	 * @return YouTubePlaylist
 	 */
-	public YouTubePlaylist getPlaylistYTData(String playlistId) {
+	public YouTubePlaylist getPlaylistYTData(String idPlaylist) {
 		YouTubePlaylist playlist = null;
-
 		// Récupère la playlist
-		Playlist playlistYTData = getRawPlaylistYTData(playlistId);
-
+		Playlist playlistYTData = getRawPlaylistYTData(idPlaylist);
 		// Conversion en playlist
 		if (playlistYTData != null) {
 			String id = playlistYTData.getId();
@@ -367,28 +396,28 @@ public class YouTubeManager {
 	/**
 	 * Récupère la playlist selon son ID (conserve l'objet YouTube Data pour modification)
 	 * 
-	 * @param playlistId
+	 * @param idPlaylist
 	 * @return Playlist
 	 */
-	public Playlist getRawPlaylistYTData(String playlistId) {
+	public Playlist getRawPlaylistYTData(String idPlaylist) {
 		Playlist playlistYTData = null;
-
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet,status");
+			List<String> id = Collections.singletonList(idPlaylist);
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,status");
 			parameters.put("field", "items(id,snippet(publishedAt,title,description,thumbnails(default(url))),status(privacyStatus))");
-			parameters.put("playlistId", playlistId);
+			parameters.put("playlistId", idPlaylist);
 
 			if (parameters.get("playlistId") != "") {
 				// Récupère la playlist de l'utilisateur OAuth selon l'ID YouTube
-				YouTube.Playlists.List playlistsListByIdCmd = youtubeService.playlists().list(parameters.get("part").toString());
-				playlistsListByIdCmd.setId(parameters.get("playlistId").toString());
-				playlistsListByIdCmd.setFields(parameters.get("field"));
-				PlaylistListResponse playlistsListResponse = playlistsListByIdCmd.execute();
-
+				YouTube.Playlists.List request = youtube.playlists().list(parts);
+				request.setId(id);
+				request.setFields(parameters.get("field"));
+				// Execute the request
+				PlaylistListResponse response = request.execute();
 				// Renvoi la playlist
-				playlistYTData = playlistsListResponse.getItems().get(0);
+				playlistYTData = response.getItems().get(0);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -404,12 +433,12 @@ public class YouTubeManager {
 	 * @param listActivPlaylist
 	 * @return List<YouTubePlaylist>
 	 */
-	public List<YouTubePlaylist> checkActive(List<YouTubePlaylist> listPlaylistYTData, List<YouTubeActivPlaylist> listActivPlaylist) {
+	public List<YouTubePlaylist> checkActive(List<YouTubePlaylist> listPlaylistYTData, List<ActivePlaylist> listActivPlaylist) {
 		if (listPlaylistYTData != null && listActivPlaylist != null) {
 			// Parcours la liste des playlists YouTube Data
 			for (YouTubePlaylist playlistYTData : listPlaylistYTData) {
 				// Parcours la liste des playlists en base
-				for (YouTubeActivPlaylist activPlaylist : listActivPlaylist) {
+				for (ActivePlaylist activPlaylist : listActivPlaylist) {
 					if (playlistYTData.getId().equals(activPlaylist.getIdYouTube())) {
 						playlistYTData.setActive(activPlaylist.isActive());
 					}
@@ -422,55 +451,54 @@ public class YouTubeManager {
 	/**
 	 * Récupère la liste des vidéos d'une playlist selon son ID et son token de page
 	 * 
-	 * @param playlistId
+	 * @param idPlaylist
 	 * @param pageToken
 	 * @return List<YouTubeVideo>
 	 */
-	public List<YouTubeVideo> getVideosYTData(String playlistId, String pageToken) {
+	public List<YouTubeVideo> getVideosYTData(String idPlaylist, String pageToken) {
 		List<YouTubeVideo> listVideo = new ArrayList<YouTubeVideo>();
-
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet,contentDetails");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,contentDetails");
 			parameters.put("field",
 					"pageInfo(totalResults),nextPageToken,prevPageToken,items(id,snippet(title,thumbnails(default(url))),contentDetails(videoId))");
 			parameters.put("maxResults", "10");
-			parameters.put("playlistId", playlistId);
+			parameters.put("playlistId", idPlaylist);
 			parameters.put("pageToken", pageToken);
 
 			if (parameters.containsKey("playlistId") && parameters.get("playlistId") != "") {
 				// Récupère la liste des vidéos de l'utilisateur OAuth selon l'ID YouTube
-				YouTube.PlaylistItems.List playlistItemsListCmd = youtubeService.playlistItems().list(parameters.get("part").toString());
-				playlistItemsListCmd.setPlaylistId(parameters.get("playlistId").toString());
-				playlistItemsListCmd.setFields(parameters.get("field").toString());
-				playlistItemsListCmd.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
+				YouTube.PlaylistItems.List request = youtube.playlistItems().list(parts);
+				request.setPlaylistId(parameters.get("playlistId").toString());
+				request.setFields(parameters.get("field").toString());
+				request.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
 				if (parameters.containsKey("pageToken") && parameters.get("pageToken") != null && !parameters.get("pageToken").isEmpty()) {
-					playlistItemsListCmd.setPageToken(pageToken);
+					request.setPageToken(pageToken);
 				}
-				PlaylistItemListResponse playlistItemsListResponse = playlistItemsListCmd.execute();
-
+				// Execute the request
+				PlaylistItemListResponse response = request.execute();
 				// Récupère la pagination et la liste des playlist items
-				int totalResults = playlistItemsListResponse.getPageInfo().getTotalResults();
-				String prevPageToken = playlistItemsListResponse.getPrevPageToken();
-				String nextPageToken = playlistItemsListResponse.getNextPageToken();
-				List<PlaylistItem> playlistItems = playlistItemsListResponse.getItems();
+				int totalResults = response.getPageInfo().getTotalResults();
+				String prevPageToken = response.getPrevPageToken();
+				String nextPageToken = response.getNextPageToken();
+				List<PlaylistItem> playlistItems = response.getItems();
 
 				// Conversion en videos
 				if (playlistItems != null && playlistItems.size() > 0) {
 					for (PlaylistItem item : playlistItems) {
 						String id = item.getContentDetails().getVideoId();
-						String itemPlaylistId = item.getId();
+						String itemIdPlaylist = item.getId();
 						String title = item.getSnippet().getTitle();
 						String urlImage;
 						if (item.getSnippet().getThumbnails().getDefault() != null) {
 							urlImage = item.getSnippet().getThumbnails().getDefault().getUrl();
 						} else {
-							urlImage = PRIVATE_IMG;
+							urlImage = "https://my-home.ovh/img/youtube/private.png";
 						}
 						// Ajoute la vidéo à la liste
-						YouTubeVideo video = new YouTubeVideo(id, playlistId, itemPlaylistId, title, urlImage, totalResults, prevPageToken,
-								nextPageToken);
+						YouTubeVideo video = new YouTubeVideo(id, idPlaylist, itemIdPlaylist, GlobalTools.encodeLatin(title), urlImage, totalResults,
+								prevPageToken, nextPageToken);
 						listVideo.add(video);
 					}
 				}
@@ -491,12 +519,11 @@ public class YouTubeManager {
 	 * @return String
 	 */
 	public String addPlaylistYTData(String title, String description, String privacy) {
-		String playlistId = "";
-
+		String idPlaylist = "";
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet,status");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,status");
 			parameters.put("field", "id");
 
 			// Construction de la playlist avec snippet et status
@@ -516,17 +543,18 @@ public class YouTubeManager {
 			playlist.setStatus(status);
 
 			// Ajoute la playlist de l'utilisateur OAuth
-			YouTube.Playlists.Insert playlistAddCmd = youtubeService.playlists().insert(parameters.get("part").toString(), playlist);
-			playlistAddCmd.setFields(parameters.get("field").toString());
-			Playlist playlistAdded = playlistAddCmd.execute();
+			YouTube.Playlists.Insert request = youtube.playlists().insert(parts, playlist);
+			request.setFields(parameters.get("field").toString());
+			// Execute the request
+			Playlist response = request.execute();
 
 			// Renvoi l'ID YouTube de la playlist
-			playlistId = playlistAdded.getId();
+			idPlaylist = response.getId();
 		} catch (Throwable t) {
 			t.printStackTrace();
 			logger.error("YouTube Data - Impossible d'ajouter la playlist");
 		}
-		return playlistId;
+		return idPlaylist;
 	}
 
 	/**
@@ -539,12 +567,11 @@ public class YouTubeManager {
 	 * @return String
 	 */
 	public String updatePlaylistYTData(Playlist playlist, String title, String description, String privacy) {
-		String playlistId = "";
-
+		String idPlaylist = "";
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet,status");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,status");
 			parameters.put("field", "id,snippet(title,description),status(privacyStatus)");
 
 			// Modification de la playlist avec snippet et status
@@ -563,34 +590,35 @@ public class YouTubeManager {
 			playlist.setStatus(status);
 
 			// Modifie la playlist de l'utilisateur OAuth
-			YouTube.Playlists.Update playlistUpdateCmd = youtubeService.playlists().update(parameters.get("part").toString(), playlist);
-			playlistUpdateCmd.setFields(parameters.get("field").toString());
-			Playlist playlistUpdated = playlistUpdateCmd.execute();
+			YouTube.Playlists.Update request = youtube.playlists().update(parts, playlist);
+			request.setFields(parameters.get("field").toString());
+			// Execute the request
+			Playlist response = request.execute();
 
 			// Renvoi l'ID YouTube de la playlist
-			playlistId = playlistUpdated.getId();
+			idPlaylist = response.getId();
 		} catch (Throwable t) {
 			t.printStackTrace();
 			logger.error("YouTube Data - Impossible de mettre à jour la playlist");
 		}
-		return playlistId;
+		return idPlaylist;
 	}
 
 	/**
 	 * Supprime la playlist et renvoi boolean
 	 * 
-	 * @param playlistId
+	 * @param idPlaylist
 	 * @return boolean
 	 */
-	public boolean deletePlaylistYTDAta(String playlistId) {
+	public boolean deletePlaylistYTDAta(String idPlaylist) {
 		boolean deleted = false;
 		try {
 			// Préparation des paramètres
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("id", playlistId);
+			parameters.put("id", idPlaylist);
 
 			// Supprime la playlist de l'utilisateur OAuth selon l'ID YouTube
-			youtubeService.playlists().delete(parameters.get("id").toString()).execute();
+			youtube.playlists().delete(parameters.get("id").toString()).execute();
 			deleted = true;
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -602,16 +630,16 @@ public class YouTubeManager {
 	/**
 	 * Ajoute la vidéo à la playlist et renvoi son ID
 	 * 
-	 * @param playlistId
+	 * @param idPlaylist
 	 * @param urlId
 	 * @return String
 	 */
-	public String addVideoPlaylistYTData(String playlistId, String urlId) {
+	public String addVideoPlaylistYTData(String idPlaylist, String urlId) {
 		String videoId = "";
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet");
 			parameters.put("field", "id");
 
 			// Modification de l'item playlist avec snippet
@@ -620,18 +648,18 @@ public class YouTubeManager {
 			resourceId.set("videoId", urlId);
 			PlaylistItemSnippet snippet = new PlaylistItemSnippet();
 			snippet.setResourceId(resourceId);
-			snippet.setPlaylistId(playlistId);
+			snippet.setPlaylistId(idPlaylist);
 			PlaylistItem playlistItem = new PlaylistItem();
 			playlistItem.setSnippet(snippet);
 
 			// Ajoute la vidéo à la playlist de l'utilisateur OAuth
-			YouTube.PlaylistItems.Insert playlistItemsInsertCmd = youtubeService.playlistItems().insert(parameters.get("part").toString(),
-					playlistItem);
-			playlistItemsInsertCmd.setFields(parameters.get("field").toString());
-			PlaylistItem playlistItemResponse = playlistItemsInsertCmd.execute();
+			YouTube.PlaylistItems.Insert request = youtube.playlistItems().insert(parts, playlistItem);
+			request.setFields(parameters.get("field").toString());
+			// Execute the request
+			PlaylistItem response = request.execute();
 
 			// Renvoi l'ID YouTube de la vidéo
-			videoId = playlistItemResponse.getId();
+			videoId = response.getId();
 		} catch (Throwable t) {
 			t.printStackTrace();
 			logger.error("YouTube Data - Impossible d'ajouter la vidéo à la playlist");
@@ -653,7 +681,7 @@ public class YouTubeManager {
 			parameters.put("id", playlistItemId);
 
 			// Supprime la vidéo de la playlist de l'utilisateur OAuth selon l'ID YouTube
-			youtubeService.playlistItems().delete(parameters.get("id").toString()).execute();
+			youtube.playlistItems().delete(parameters.get("id").toString()).execute();
 
 			deleted = true;
 		} catch (Throwable t) {
@@ -674,33 +702,34 @@ public class YouTubeManager {
 		List<YouTubeVideo> listVideo = new ArrayList<YouTubeVideo>();
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet");
+			List<String> type = Collections.singletonList("video");
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet");
 			parameters.put("field", "pageInfo(totalResults),nextPageToken,prevPageToken,items(id(videoId),snippet(title,thumbnails(default(url))))");
 			parameters.put("maxResults", "10");
-			parameters.put("type", "video");
 			parameters.put("embeddable", "true");
 			parameters.put("q", searchInput);
 			parameters.put("pageToken", pageToken);
 
 			if (parameters.containsKey("q") && parameters.get("q") != "") {
 				// Recherche des vidéos
-				YouTube.Search.List searchByKeywordCmd = youtubeService.search().list(parameters.get("part").toString());
-				searchByKeywordCmd.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
-				searchByKeywordCmd.setQ(parameters.get("q").toString());
-				searchByKeywordCmd.setType(parameters.get("type").toString());
-				searchByKeywordCmd.setFields(parameters.get("field").toString());
-				searchByKeywordCmd.setVideoEmbeddable(parameters.get("embeddable").toString());
+				YouTube.Search.List request = youtube.search().list(parts);
+				request.setMaxResults(Long.parseLong(parameters.get("maxResults").toString()));
+				request.setQ(parameters.get("q").toString());
+				request.setType(type);
+				request.setFields(parameters.get("field").toString());
+				request.setVideoEmbeddable(parameters.get("embeddable").toString());
 				if (parameters.containsKey("pageToken") && parameters.get("pageToken") != null && !parameters.get("pageToken").isEmpty()) {
-					searchByKeywordCmd.setPageToken(pageToken);
+					request.setPageToken(pageToken);
 				}
-				SearchListResponse searchListResponse = searchByKeywordCmd.execute();
+				// Execute the request
+				SearchListResponse response = request.execute();
 
 				// Récupère la pagination et la liste des résultats
-				int totalResults = searchListResponse.getPageInfo().getTotalResults();
-				String prevPageToken = searchListResponse.getPrevPageToken();
-				String nextPageToken = searchListResponse.getNextPageToken();
-				List<SearchResult> listSearchResult = searchListResponse.getItems();
+				int totalResults = response.getPageInfo().getTotalResults();
+				String prevPageToken = response.getPrevPageToken();
+				String nextPageToken = response.getNextPageToken();
+				List<SearchResult> listSearchResult = response.getItems();
 
 				// Conversion en videos
 				if (listSearchResult != null && listSearchResult.size() > 0) {
@@ -746,15 +775,15 @@ public class YouTubeManager {
 	/**
 	 * Recherche des vidéos à partir d'une URL de playlist et de son token de page
 	 * 
-	 * @param urlPlaylistId
+	 * @param urlIdPlaylist
 	 * @param pageToken
 	 * @return List<YouTubeVideo>
 	 */
-	private List<YouTubeVideo> searchPlaylistUrlResults(String urlPlaylistId, String pageToken) {
+	private List<YouTubeVideo> searchPlaylistUrlResults(String urlIdPlaylist, String pageToken) {
 		List<YouTubeVideo> listVideo = new ArrayList<YouTubeVideo>();
 
 		// Récupère la liste des vidéos de la playlist
-		listVideo = getVideosYTData(urlPlaylistId, pageToken);
+		listVideo = getVideosYTData(urlIdPlaylist, pageToken);
 
 		return listVideo;
 	}
@@ -769,26 +798,27 @@ public class YouTubeManager {
 		List<YouTubeVideo> listVideo = new ArrayList<YouTubeVideo>();
 		try {
 			// Préparation des paramètres
+			List<String> parts = Collections.singletonList("snippet");
+			List<String> id = Collections.singletonList(urlVideoId);
 			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet");
 			parameters.put("field", "items(id,snippet(title,thumbnails(default(url))))");
-			parameters.put("id", urlVideoId);
 
 			if (parameters.containsKey("id") && parameters.get("id") != "") {
 				// Recherche la vidéo
-				YouTube.Videos.List videosListByIdCmd = youtubeService.videos().list(parameters.get("part").toString());
-				videosListByIdCmd.setId(parameters.get("id").toString());
-				videosListByIdCmd.setFields(parameters.get("field").toString());
-				VideoListResponse videoListResponse = videosListByIdCmd.execute();
+				YouTube.Videos.List request = youtube.videos().list(parts);
+				request.setId(id);
+				request.setFields(parameters.get("field").toString());
+				// Execute the request
+				VideoListResponse response = request.execute();
 
 				// Conversion en video
-				if (videoListResponse != null) {
-					Video videoResponse = videoListResponse.getItems().get(0);
-					String id = videoResponse.getId();
+				if (response != null) {
+					Video videoResponse = response.getItems().get(0);
+					String vidId = videoResponse.getId();
 					String title = videoResponse.getSnippet().getTitle();
 					String urlImage = videoResponse.getSnippet().getThumbnails().getDefault().getUrl();
 					// Ajoute la vidéo à la liste
-					YouTubeVideo video = new YouTubeVideo(id, "", "", title, urlImage, 1, "", "");
+					YouTubeVideo video = new YouTubeVideo(vidId, "", "", title, urlImage, 1, "", "");
 					listVideo.add(video);
 				}
 			}

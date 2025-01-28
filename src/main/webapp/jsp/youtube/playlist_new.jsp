@@ -1,11 +1,3 @@
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	String error = (String) view.getValueForKey("error");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -15,17 +7,17 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="yt.pl.add.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- Font Awesome CSS -->
-<link href="<%=path%>/css/plugins/font-awesome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/font-awesome.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 <!-- Custom CSS -->
-<link href="<%=path%>/css/youtube/youtube.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/youtube/youtube.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -41,20 +33,17 @@
 								<i class="fab fa-youtube fa-fw"></i> <fmt:message key="yt.pl.add.header" />
 								<div class="pull-right">
 									<button type="submit" form="newPlaylistForm" class="btn btn-success btn-xs btn-fixed"><fmt:message key="global.save" /></button>
-									<a class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/youtube_playlists?action=list"><fmt:message key="global.back" /></a>
+									<a class="btn btn-primary btn-xs btn-fixed" href="${pageContext.request.contextPath}/youtube_playlists?action=list"><fmt:message key="global.back" /></a>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
 							<div class="panel-body">
-								<%
-									if (error != null) {
-								%>
-								<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger panel-notification center" role="alert">
-									<p><strong>Oops ! </strong><%=error%><i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
-								</div>
-								<%
-									}
-								%>
+								<c:if test="${not empty requestScope.error}">
+									<div id="alert-danger" class="col-xs-offset-1 col-xs-10 alert alert-danger panel-notification center" role="alert">
+										<p><strong>Oops ! </strong>${requestScope.error}<i id="close-alert-danger" class="fas fa-times-circle fa-fw close-button black"></i></p>
+									</div>
+								</c:if>
+								<!-- Form Add -->
 								<form id="newPlaylistForm" action="youtube_playlists" method="post">
 									<input type="hidden" name="action" value="add">
 									<div class="col-xs-12 col-sm-offset-1 col-sm-5 marged-top">
@@ -97,6 +86,7 @@
 										<span class="checkbox-item"><fmt:message key="global.on" /></span>
 									</div>
 								</form>
+								<!-- End Form Add -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -106,10 +96,10 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

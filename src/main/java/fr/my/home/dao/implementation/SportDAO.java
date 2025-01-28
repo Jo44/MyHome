@@ -4,9 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -14,33 +11,31 @@ import fr.my.home.bean.Sport;
 import fr.my.home.dao.HibernateDAO;
 import fr.my.home.exception.FonctionnalException;
 import fr.my.home.exception.TechnicalException;
-import fr.my.home.tool.DatabaseAccess;
+import fr.my.home.tool.HibernateUtil;
 import fr.my.home.tool.properties.Settings;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceException;
 
 /**
- * Classe SportDAO qui gère le stockage des activités sportives
+ * Classe SportDAO
  * 
  * @author Jonathan
- * @version 1.0
- * @since 15/07/2021
+ * @version 1.1
+ * @since 15/01/2025
  */
 public class SportDAO implements HibernateDAO<Sport> {
 
-	// Attributes
+	/**
+	 * Attributs
+	 */
 
 	private static final String SPORTDAO_GET_ALL_FROM_PERIOD = Settings.getStringProperty("sport.get.all.from.period");
 	private static final String SPORTDAO_GET_ONE = Settings.getStringProperty("sport.get.one");
 
-	// Constructor
-
 	/**
-	 * Default Constructor
+	 * Constructeur
 	 */
-	public SportDAO() {
-		super();
-	}
-
-	// Methods
+	public SportDAO() {}
 
 	/**
 	 * Récupère la liste de toutes les activités sportives de l'utilisateur pour la période précisée
@@ -53,14 +48,13 @@ public class SportDAO implements HibernateDAO<Sport> {
 	 */
 	public List<Sport> getAllSportsFromPeriod(int userId, Timestamp from, Timestamp to) throws TechnicalException {
 		List<Sport> listSport = new ArrayList<Sport>();
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Sport> query = session.createQuery(SPORTDAO_GET_ALL_FROM_PERIOD);
-		query.setParameter("sport_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Sport> query = session.createQuery(SPORTDAO_GET_ALL_FROM_PERIOD, Sport.class);
+		query.setParameter("id_user", userId);
 		query.setParameter("from", from);
 		query.setParameter("to", to);
 		listSport = query.getResultList();
-		DatabaseAccess.getInstance().validateSession(session);
+		HibernateUtil.getInstance().validateSession(session);
 		return listSport;
 	}
 
@@ -75,40 +69,42 @@ public class SportDAO implements HibernateDAO<Sport> {
 	 */
 	public Sport getOneSport(int sportId, int userId) throws FonctionnalException, TechnicalException {
 		Sport sport = null;
-		Session session = DatabaseAccess.getInstance().openSession();
-		@SuppressWarnings("unchecked")
-		Query<Sport> query = session.createQuery(SPORTDAO_GET_ONE);
-		query.setParameter("sport_id", sportId);
-		query.setParameter("sport_id_user", userId);
+		Session session = HibernateUtil.getInstance().openSession();
+		Query<Sport> query = session.createQuery(SPORTDAO_GET_ONE, Sport.class);
+		query.setParameter("id", sportId);
+		query.setParameter("id_user", userId);
+		query.setMaxResults(1);
 		try {
 			sport = query.getSingleResult();
 		} catch (NoResultException nre) {
 			throw new FonctionnalException("L'activité sportive n'existe pas");
 		} finally {
-			DatabaseAccess.getInstance().validateSession(session);
+			HibernateUtil.getInstance().validateSession(session);
 		}
 		return sport;
 	}
 
 	/**
-	 * Ajoute une nouvelle activité sportive en base et renvoi son ID, ou exception fonctionnelle si impossible
+	 * Ajoute une nouvelle activité sportive, ou exception fonctionnelle si impossible
 	 * 
 	 * @param sport
-	 * @return int
 	 * @param FonctionnalException
 	 * @throws TechnicalException
 	 */
 	@Override
-	public int add(Sport sport) throws FonctionnalException, TechnicalException {
-		int id = 0;
-		Session session = DatabaseAccess.getInstance().openSession();
+	public void add(Sport sport) throws FonctionnalException, TechnicalException {
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			id = (int) session.save(sport);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.persist(sport);
+			session.flush();
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible d'ajouter l'activité sportive");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
-		return id;
 	}
 
 	/**
@@ -120,12 +116,16 @@ public class SportDAO implements HibernateDAO<Sport> {
 	 */
 	@Override
 	public void update(Sport sport) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.saveOrUpdate(sport);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.merge(sport);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de mettre à jour l'activité sportive");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 
@@ -138,12 +138,16 @@ public class SportDAO implements HibernateDAO<Sport> {
 	 */
 	@Override
 	public void delete(Sport sport) throws FonctionnalException, TechnicalException {
-		Session session = DatabaseAccess.getInstance().openSession();
+		Session session = HibernateUtil.getInstance().openSession();
 		try {
-			session.delete(sport);
-			DatabaseAccess.getInstance().validateSession(session);
+			session.remove(sport);
+			HibernateUtil.getInstance().validateSession(session);
 		} catch (PersistenceException pe) {
 			throw new FonctionnalException("Impossible de supprimer l'activité sportive");
+		} finally {
+			if (session != null && session.isOpen()) {
+				HibernateUtil.getInstance().closeSession(session);
+			}
 		}
 	}
 

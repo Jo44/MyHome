@@ -1,15 +1,3 @@
-<%@ page import="java.text.SimpleDateFormat"%>
-<%@ page import="java.sql.Timestamp"%>
-<%@ page import="fr.my.home.bean.User"%>
-<%@ page import="fr.my.home.bean.jsp.ViewJSP"%>
-<%
-	String path = getServletContext().getContextPath();
-	User user = (User) request.getSession().getAttribute("user");
-	ViewJSP view = (ViewJSP) request.getAttribute("view");
-	SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - HH:mm");
-	Timestamp sessionStart = (Timestamp) view.getValueForKey("sessionStart");
-	boolean databaseOnline = (boolean) view.getValueForKey("databaseOnline");
-%>
 <!DOCTYPE html>
 <html lang="${sessionScope.lang}">
 <head>
@@ -19,13 +7,13 @@
 <meta name="description" content="My Home">
 <meta name="author" content="Jonathan">
 <title><fmt:message key="status.page.title" /></title>
-<link href="<%=path%>/img/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon" type="image/x-icon" />
 <!-- Bootstrap CSS -->
-<link href="<%=path%>/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/bootstrap.css" rel="stylesheet" type="text/css" />
 <!-- SB Admin CSS -->
-<link href="<%=path%>/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/plugins/sb-admin.css" rel="stylesheet" type="text/css" />
 <!-- My Home CSS -->
-<link href="<%=path%>/css/myhome.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/myhome.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -40,41 +28,38 @@
 							<div class="panel-heading">
 								<i class="fas fa-wrench fa-fw"></i> <fmt:message key="status.header" />
 								<div class="pull-right">
-									<a class="btn btn-primary btn-xs btn-fixed" href="<%=path%>/status_inside"><fmt:message key="global.refresh" /></a>
+									<a class="btn btn-primary btn-xs btn-fixed" href="${pageContext.request.contextPath}/status_inside"><fmt:message key="global.refresh" /></a>
 								</div>
 								<div class="fixHeight"></div>
 							</div>
 							<div class="panel-body">
+								<!-- Session Start -->
 								<div class="col-xs-offset-1 col-xs-10 big-marged-top marged-bottom center">
 									<p><i class="fas fa-clock fa-fw"></i> <fmt:message key="status.session" />
-										<%
-											if (sessionStart != null) {
-										%>
-											<span class="green bold"><%=formatter.format(sessionStart)%></span>
-										<%
-											} else {
-										%>
-											<span class="red bold">null</span>
-										<%
-											}
-										%>
+										<c:choose>
+											<c:when test="${not empty requestScope.sessionStart}">
+												<span class="green bold">${requestScope.sessionStart}</span>
+											</c:when>
+											<c:otherwise>
+												<span class="red bold">???</span>
+											</c:otherwise>
+										</c:choose>
 									</p>
 								</div>
+								<!-- Database Status -->
 								<div class="col-xs-offset-1 col-xs-10 marged-top big-marged-bottom center">
 									<p><i class="fas fa-database fa-fw"></i> <fmt:message key="status.database" />
-										<%
-											if (databaseOnline) {
-										%>
-											<span class="green bold"><fmt:message key="global.online" /></span>
-										<%
-											} else {
-										%>
-											<span class="red bold"><fmt:message key="global.offline" /></span>
-										<%
-											}
-										%>
+										<c:choose>
+											<c:when test="${requestScope.databaseOnline}">
+												<span class="green bold"><fmt:message key="global.online" /></span>
+											</c:when>
+											<c:otherwise>
+												<span class="red bold"><fmt:message key="global.offline" /></span>
+											</c:otherwise>
+										</c:choose>
 									</p>
 								</div>
+								<!-- End -->
 							</div>
 							<div class="panel-footer"></div>
 						</div>
@@ -84,12 +69,12 @@
 		</div>
 	</div>
 	<!-- jQuery -->
-	<script src="<%=path%>/js/plugins/jquery.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/jquery.js"></script>
 	<!-- Bootstrap JavaScript -->
-	<script src="<%=path%>/js/plugins/bootstrap.js"></script>
+	<script src="${pageContext.request.contextPath}/js/plugins/bootstrap.js"></script>
 	<!-- Font Awesome JavaScript -->
 	<script src="https://kit.fontawesome.com/3010c2773a.js" crossorigin="anonymous"></script>
 	<!-- My Home JavaScript -->
-	<script src="<%=path%>/js/myhome.js"></script>
+	<script src="${pageContext.request.contextPath}/js/myhome.js"></script>
 </body>
 </html>

@@ -21,19 +21,22 @@ import fr.my.home.exception.TechnicalException;
  * Classe UserDAOTest qui teste le stockage des utilisateurs
  * 
  * @author Jonathan
- * @version 1.0
+ * @version 1.1
  */
 public class UserDAOTest {
 
-	// Attributs
-	private UserDAO userDAO;
-	private Timestamp ts;
+	/**
+	 * Attributs
+	 */
 
-	// Constructeur
+	private UserDAO userDAO;
+
+	/**
+	 * Constructeur
+	 */
 	public UserDAOTest() {
 		super();
 		userDAO = new UserDAO();
-		ts = Timestamp.valueOf(LocalDateTime.now());
 	}
 
 	/**
@@ -53,7 +56,7 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserOk() {
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUser("name", "pass");
@@ -83,7 +86,7 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserByUsernameOk() {
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUserByUsername("name");
@@ -113,7 +116,7 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserByEmailOk() {
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUserByEmail("email@domain.com");
@@ -143,7 +146,8 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserByRememberMeTokenOk() {
-		User user = new User("name", "pass", "email@domain.com", "token", "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", "token", "token", true, null, null, null, null,
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUserByRememberMeToken("token");
@@ -173,7 +177,7 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserByValidationTokenOk() {
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUserByValidationToken("token");
@@ -203,7 +207,8 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void getUserByReInitTokenOk() {
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, "token", null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, "token", null, null, null,
+				Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			user = userDAO.getUserByReInitToken("token");
@@ -233,23 +238,21 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void addOk() {
-		int id = 0;
-		User user = null;
+		boolean valid = false;
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
-			id = userDAO.add(user);
+			userDAO.add(user);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
 		} finally {
-			if (id != 0) {
-				try {
-					userDAO.delete(user);
-				} catch (FonctionnalException | TechnicalException ex) {
-					ex.printStackTrace();
-				}
+			try {
+				userDAO.delete(user);
+			} catch (FonctionnalException | TechnicalException ex) {
+				ex.printStackTrace();
 			}
 		}
-		assertTrue(id != 0);
+		assertTrue(valid);
 	}
 
 	/**
@@ -257,14 +260,19 @@ public class UserDAOTest {
 	 */
 	@Test
 	public void addKo() {
-		int id;
+		boolean valid = true;
+		User user = new User(null, "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			User user = new User();
-			id = userDAO.add(user);
+			userDAO.add(user);
+			valid = true;
 		} catch (FonctionnalException | TechnicalException ex) {
-			id = 0;
+			valid = false;
+		} finally {
+			try {
+				userDAO.delete(user);
+			} catch (FonctionnalException | TechnicalException ex) {}
 		}
-		assertTrue(id == 0);
+		assertFalse(valid);
 	}
 
 	/**
@@ -273,9 +281,9 @@ public class UserDAOTest {
 	@Test
 	public void updateOk() {
 		boolean valid = false;
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = userDAO.add(user);
+			userDAO.add(user);
 			try {
 				user.setPass("anotherPass");
 				userDAO.update(user);
@@ -283,12 +291,10 @@ public class UserDAOTest {
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						userDAO.delete(user);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					userDAO.delete(user);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -303,21 +309,21 @@ public class UserDAOTest {
 	@Test
 	public void updateKo() {
 		boolean valid = true;
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
-			int id = userDAO.add(user);
+			userDAO.add(user);
 			try {
 				user.setPass(null);
 				userDAO.update(user);
+				valid = true;
 			} catch (FonctionnalException | TechnicalException ex) {
 				valid = false;
 			} finally {
-				if (id != 0) {
-					try {
-						userDAO.delete(user);
-					} catch (FonctionnalException | TechnicalException ex) {
-						ex.printStackTrace();
-					}
+				try {
+					user.setPass("pass");
+					userDAO.delete(user);
+				} catch (FonctionnalException | TechnicalException ex) {
+					ex.printStackTrace();
 				}
 			}
 		} catch (FonctionnalException | TechnicalException ex) {
@@ -332,7 +338,7 @@ public class UserDAOTest {
 	@Test
 	public void deleteOk() {
 		boolean valid = false;
-		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, ts);
+		User user = new User("name", "pass", "email@domain.com", null, "token", true, null, null, null, null, Timestamp.valueOf(LocalDateTime.now()));
 		try {
 			userDAO.add(user);
 			userDAO.delete(user);

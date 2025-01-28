@@ -2,8 +2,8 @@
 /////       Snake       /////
 /////////////////////////////
 //   @author Jonathan      //
-//   @version 1.0          //
-//   @since 01/01/2025     //
+//   @version 1.1          //
+//   @since 17/01/2025     //
 /////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -43,9 +43,9 @@ let direction;
 let foods;
 let levels;
 let level;
-let selectedLevel = "0";
+let selectedLevel = "1";
 let speed;
-let selectedSpeed = "100";
+let selectedSpeed = "1";
 
 // Scores variables
 let records;
@@ -127,11 +127,11 @@ async function endGame() {
 // Initialisation du jeu
 function initGame() {
 	// Initialisation du level
-	level = selectedLevel;
+	level = selectedLevel - 1;
 	// Initialisation de la vitesse
-	speed = selectedSpeed;
+	getSpeed();
 	// Initialisation de la base de score
-	calculateBaseScore(level, speed);
+	calculateBaseScore();
 	// Initialisation du score
 	score = 0;
 	// Position initiale du Snake (centre)
@@ -245,7 +245,6 @@ function updateGame() {
 		x: snake[0].x + direction.x,
 		y: snake[0].y + direction.y
 	};
-
 	// Gestion des bords
 	if (head.x < 0) {
 		head.x = 30 - 1;
@@ -257,10 +256,8 @@ function updateGame() {
 	} else if (head.y >= 30) {
 		head.y = 0;
 	}
-
 	// Ajoute la nouvelle tête au début du Snake
 	snake.unshift(head);
-
 	// Vérifie si le Snake mange la nourriture
 	if (!checkFoodCollision()) {
 		// Si le Snake n'a pas mangé, retirer la queue
@@ -273,6 +270,22 @@ function updateGame() {
 		score += baseScore;
 		// Audio - Food Sound
 		playFX(soundFood);
+	}
+}
+
+// Calcul de la vitesse
+function getSpeed() {
+	// Speed en ms entre les frames
+	switch (selectedSpeed) {
+		case "3":
+			speed = 75;
+			break;
+		case "2":
+			speed = 125;
+			break;
+		case "1":
+			speed = 175;
+			break;	
 	}
 }
 
@@ -582,29 +595,29 @@ function isARecord() {
 }
 
 // Détermine le score de base en fonction du niveau et de la vitesse
-function calculateBaseScore(level, speed) {
+function calculateBaseScore() {
 	baseScore = 1;
 	// En fonction du niveau
 	switch (level) {
-		case "2":
+		case "3":
 			baseScore += 2;
 			break;
-		case "1":
+		case "2":
 			baseScore += 1;
 			break;
-		case "0":
+		case "1":
 			baseScore += 0;
 			break;
 	}
 	// En fonction de la vitesse
-	switch (speed) {
-		case "50":
+	switch (selectedSpeed) {
+		case "3":
 			baseScore += 2;
 			break;
-		case "75":
+		case "2":
 			baseScore += 1;
 			break;
-		case "100":
+		case "1":
 			baseScore += 0;
 			break;
 	}
@@ -719,9 +732,10 @@ function isOnPlayButton(event) {
 	return x >= 240 && x <= 360	&& y >= 200 && y <= 250;
 }
 
-// Touches directionnelles
+// Key Down
 document.addEventListener('keydown', (event) => {
 	if (isGameRunning) {
+		// Touches directionnelles
 		switch (event.key) {
 			case 'ArrowUp':
 				if (direction.y === 0) direction = { x: 0, y: -1 };
@@ -735,6 +749,20 @@ document.addEventListener('keydown', (event) => {
 			case 'ArrowRight':
 				if (direction.x === 0) direction = { x: 1, y: 0 };
 				break;
+		}
+	} else {
+		// Touche Espace
+		if (event.code === 'Space') {
+			// Joue la musique de background
+			if (!isBckMusicPlaying) {
+				// Audio - Background Music
+				playMusic(soundMusic);
+				isBckMusicPlaying = true;
+			}
+			// Cache le curseur
+			canvas.style.cursor = 'none';
+			// Lance le jeu
+			startGame();
 		}
 	}
 });
