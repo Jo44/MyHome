@@ -1,28 +1,33 @@
 # MyHome (my-home.ovh)
 
 
-![001](https://github.com/user-attachments/assets/e7406267-1ef6-492c-bb34-264cce7d243a)
-![002](https://github.com/user-attachments/assets/9dc88de0-319d-4c50-bc6b-36159bbd4d90)
+![001](https://github.com/user-attachments/assets/6f052c63-3685-495c-95a7-d00bd06baa2c)
+![002](https://github.com/user-attachments/assets/eb14fcce-615d-4262-b21e-fadce4df093a)
 
 
 Ce site web a été développé à partir de Mars 2021 afin de progresser dans le développement informatique.
 Aucune équipe, aucune deadline, aucun budget, juste de l'envie.
 
 Ce projet a été développé avec l'IDE Eclipse et mis en ligne avec un Raspberry Pi 3.
-L'architecture back-end repose sur un conteneur de servlets Java relié à une base de données MySQL et le front-end est développé en HTML(JSP)/CSS/Javascript(jQuery).
+L'architecture back-end repose sur un conteneur de servlets Java relié à une base de données MariaDB et le front-end est développé en HTML(JSP/JSTL/EL)/CSS/Javascript(jQuery).
 
 
-![004](https://github.com/user-attachments/assets/353e7180-a733-4ba8-ac91-fe3a3d46ead8)
-![003](https://github.com/user-attachments/assets/bcde8d71-c7d6-472b-aa13-834fbf5b3a59)
+![003](https://github.com/user-attachments/assets/3ef900c4-5273-49e1-ba64-98a42e889c2f)
+![004](https://github.com/user-attachments/assets/e4b6594e-d45a-4084-afa1-a1ac2d36fadb)
 
 
 # Link (Web)
 
-* MyHome  :  
+* MyHome :  
 https://my-home.ovh  
 
 # Changelog
 
+* Update 3.0 - 28/01/2025 :  
+  * Migration Java 1.8 -> Java 21
+  * Mise à jour des dépendances
+  * Utilisation de JSTL / EL au lieu de scriptlets
+  * YouTube -> Flux d'authentification Google OAuth 2.0
 * Update 2.0 - 01/01/2025 :  
   * Jeu Snake (Canvas HTML5 UI + Javascript + async requests)
   * Jeu de la vie - Amélioration UI
