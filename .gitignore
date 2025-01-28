@@ -19,16 +19,12 @@ hibernate.cfg.xml
 # Properties
 *.properties
 
-# OAuth
-src/main/resources/oauth/
-client_secrets.json
-
 # CSS Plugins
 src/main/webapp/css/plugins/
 
 # JS Plugins
 src/main/webapp/js/plugins/
 
-# INF
-src/main/webapp/META-INF/
-src/main/webapp/WEB-INF/
+# WEB-INF
+src/main/webapp/WEB-INF/classes
+src/main/webapp/WEB-INF/lib
