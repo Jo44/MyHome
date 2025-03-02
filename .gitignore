@@ -6,7 +6,6 @@ src/main/resources/hibernate.cfg.xml
 src/main/resources/*.readme
 src/main/webapp/css/plugins
 src/main/webapp/js/plugins
-src/main/webapp/META-INF
 src/main/webapp/WEB-INF/classes
 src/main/webapp/WEB-INF/lib
 src/test/resources/sql
