@@ -1,22 +1,21 @@
-# MyHome (my-home.ovh)
-
-
-![001](https://github.com/user-attachments/assets/6f052c63-3685-495c-95a7-d00bd06baa2c)
-![002](https://github.com/user-attachments/assets/eb14fcce-615d-4262-b21e-fadce4df093a)
-
-
+# MyHome (my-home.ovh)  
+  
+![001](https://github.com/user-attachments/assets/6f052c63-3685-495c-95a7-d00bd06baa2c)  
+  
+![002](https://github.com/user-attachments/assets/eb14fcce-615d-4262-b21e-fadce4df093a)  
+  
 Ce site web a été développé à partir de Mars 2021 afin de progresser dans le développement informatique.
 Aucune équipe, aucune deadline, aucun budget, juste de l'envie !
 
 Ce projet a été développé avec l'IDE Eclipse et mis en ligne avec un Raspberry Pi 3.
 L'architecture back-end repose sur un conteneur de servlets Java relié à une base de données MariaDB et le front-end est développé en HTML(JSP/JSTL/EL)/CSS/Javascript(jQuery).
+  
+![003](https://github.com/user-attachments/assets/3ef900c4-5273-49e1-ba64-98a42e889c2f)  
+  
+![004](https://github.com/user-attachments/assets/e4b6594e-d45a-4084-afa1-a1ac2d36fadb)  
+  
 
-
-![003](https://github.com/user-attachments/assets/3ef900c4-5273-49e1-ba64-98a42e889c2f)
-![004](https://github.com/user-attachments/assets/e4b6594e-d45a-4084-afa1-a1ac2d36fadb)
-
-
-# Link (Web)
+# Web
 
 * MyHome :  
 https://my-home.ovh  
