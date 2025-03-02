@@ -59,35 +59,37 @@ public class PlayerServlet extends HttpServlet {
 
 		// Vérifie si l'utilisateur en session possède un token d'accès OAuth 2.0
 		User user = (User) request.getSession().getAttribute("user");
-		if (user != null && user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
-			try {
-				// Initialisation du service YouTube
-				ytMgr = new YouTubeManager(request.getSession());
-				if (ytMgr != null) {
-					authenticated = true;
+		if (user != null) {
+			if (user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
+				try {
+					// Initialisation du service YouTube
+					ytMgr = new YouTubeManager(request.getSession());
+					if (ytMgr != null) {
+						authenticated = true;
+					}
+				} catch (Exception ex) {
+					logger.error("Erreur d'initialisation du Service YouTube");
+					logger.error(ex.getMessage());
 				}
-			} catch (Exception ex) {
-				logger.error("Erreur d'initialisation du Service YouTube");
-				logger.error(ex.getMessage());
 			}
-		}
 
-		// Selon état de l'authentification
-		if (authenticated) {
-			// Supprime l'attribut erreur si il existe
-			request.getSession().removeAttribute("error");
+			// Selon état de l'authentification
+			if (authenticated) {
+				// Supprime l'attribut erreur si il existe
+				request.getSession().removeAttribute("error");
 
-			// Récupère la langue de l'utilisateur (pour messages success/error)
-			String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
+				// Récupère la langue de l'utilisateur (pour messages success/error)
+				String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
 
-			// Récupère la liste des playlists actives de l'utilisateur et leurs vidéos
-			getActivePlaylistsAndVideosFunction(request, user.getId(), lang);
+				// Récupère la liste des playlists actives de l'utilisateur et leurs vidéos
+				getActivePlaylistsAndVideosFunction(request, user.getId(), lang);
 
-			// Redirection vers JSP
-			redirectToYouTubePlayerJSP(request, response);
-		} else {
-			// Redirection vers la page de connexion OAuth 2.0
-			redirectToLogInServlet(request, response, user);
+				// Redirection vers JSP
+				redirectToYouTubePlayerJSP(request, response);
+			} else {
+				// Redirection vers la page de connexion OAuth 2.0
+				redirectToLogInServlet(request, response, user);
+			}
 		}
 	}
 

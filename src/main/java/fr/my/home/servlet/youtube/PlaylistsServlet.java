@@ -68,92 +68,94 @@ public class PlaylistsServlet extends HttpServlet {
 
 		// Vérifie si l'utilisateur en session possède un token d'accès OAuth 2.0
 		User user = (User) request.getSession().getAttribute("user");
-		if (user != null && user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
-			try {
-				// Initialisation du service YouTube
-				ytMgr = new YouTubeManager(request.getSession());
-				if (ytMgr != null) {
-					authenticated = true;
+		if (user != null) {
+			if (user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
+				try {
+					// Initialisation du service YouTube
+					ytMgr = new YouTubeManager(request.getSession());
+					if (ytMgr != null) {
+						authenticated = true;
+					}
+				} catch (Exception ex) {
+					logger.error("Erreur d'initialisation du Service YouTube");
+					logger.error(ex.getMessage());
 				}
-			} catch (Exception ex) {
-				logger.error("Erreur d'initialisation du Service YouTube");
-				logger.error(ex.getMessage());
 			}
-		}
 
-		// Selon état de l'authentification
-		if (authenticated) {
-			// Récupère l'attribut error si il existe
-			String error = (String) request.getSession().getAttribute("error");
-			request.getSession().removeAttribute("error");
-			request.setAttribute("error", error);
+			// Selon état de l'authentification
+			if (authenticated) {
+				// Récupère l'attribut error si il existe
+				String error = (String) request.getSession().getAttribute("error");
+				request.getSession().removeAttribute("error");
+				request.setAttribute("error", error);
 
-			// Récupère l'attribut success si il existe
-			String success = (String) request.getSession().getAttribute("success");
-			request.getSession().removeAttribute("success");
-			request.setAttribute("success", success);
+				// Récupère l'attribut success si il existe
+				String success = (String) request.getSession().getAttribute("success");
+				request.getSession().removeAttribute("success");
+				request.setAttribute("success", success);
 
-			// Récupère l'ID de l'utilisateur en session
-			int userId = ((User) request.getSession().getAttribute("user")).getId();
+				// Récupère l'ID de l'utilisateur en session
+				int userId = ((User) request.getSession().getAttribute("user")).getId();
 
-			// Récupère la langue de l'utilisateur (pour messages success/error)
-			String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
+				// Récupère la langue de l'utilisateur (pour messages success/error)
+				String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
 
-			// Récupère les paramètres de la requête
-			String action = request.getParameter("action");
-			String youtubeId = request.getParameter("idPlaylist");
-			String currentPage = request.getParameter("current");
-			String pageToken = request.getParameter("pageToken");
-			String orderBy = request.getParameter("order-by");
-			String dir = request.getParameter("dir");
+				// Récupère les paramètres de la requête
+				String action = request.getParameter("action");
+				String youtubeId = request.getParameter("idPlaylist");
+				String currentPage = request.getParameter("current");
+				String pageToken = request.getParameter("pageToken");
+				String orderBy = request.getParameter("order-by");
+				String dir = request.getParameter("dir");
 
-			// Détermine le traitement en fonction des paramètres
-			// Si paramètre action est renseigné
-			if (action != null) {
-				switch (action) {
-					// Si action list
-					case "list":
-						// Renvoi à la liste des playlists de l'utilisateur
-						redirectToPlaylistList(request, response, userId, currentPage, pageToken, orderBy, dir, lang);
-						break;
-					// Si action ajouter
-					case "add":
-						// Redirection vers la JSP d'ajout
-						redirectToNewYouTubePlaylistJSP(request, response);
-						break;
-					// Si action modifier
-					case "update":
-						// Récupère la playlist
-						if (getOneFunction(request, userId, youtubeId, currentPage, pageToken, orderBy, dir, lang)) {
-							// Redirige vers la JSP de modification
-							redirectToUpdateYouTubePlaylistJSP(request, response);
-						} else {
+				// Détermine le traitement en fonction des paramètres
+				// Si paramètre action est renseigné
+				if (action != null) {
+					switch (action) {
+						// Si action list
+						case "list":
+							// Renvoi à la liste des playlists de l'utilisateur
+							redirectToPlaylistList(request, response, userId, currentPage, pageToken, orderBy, dir, lang);
+							break;
+						// Si action ajouter
+						case "add":
+							// Redirection vers la JSP d'ajout
+							redirectToNewYouTubePlaylistJSP(request, response);
+							break;
+						// Si action modifier
+						case "update":
+							// Récupère la playlist
+							if (getOneFunction(request, userId, youtubeId, currentPage, pageToken, orderBy, dir, lang)) {
+								// Redirige vers la JSP de modification
+								redirectToUpdateYouTubePlaylistJSP(request, response);
+							} else {
+								// Renvoi à la liste des playlists de l'utilisateur
+								redirectToThisServletWithList(request, response);
+							}
+							break;
+						// Si action supprimer
+						case "delete":
+							// Essaye de supprimer la playlist
+							deleteFunction(request, userId, youtubeId, lang);
+
 							// Renvoi à la liste des playlists de l'utilisateur
 							redirectToThisServletWithList(request, response);
-						}
-						break;
-					// Si action supprimer
-					case "delete":
-						// Essaye de supprimer la playlist
-						deleteFunction(request, userId, youtubeId, lang);
-
-						// Renvoi à la liste des playlists de l'utilisateur
-						redirectToThisServletWithList(request, response);
-						break;
-					// Si action non reconnu
-					default:
-						// Renvoi à la liste des playlists de l'utilisateur
-						redirectToThisServletWithList(request, response);
-						break;
+							break;
+						// Si action non reconnu
+						default:
+							// Renvoi à la liste des playlists de l'utilisateur
+							redirectToThisServletWithList(request, response);
+							break;
+					}
+				} else {
+					// Si paramètre action non renseigné
+					// Renvoi à la liste des playlists de l'utilisateur
+					redirectToThisServletWithList(request, response);
 				}
 			} else {
-				// Si paramètre action non renseigné
-				// Renvoi à la liste des playlists de l'utilisateur
-				redirectToThisServletWithList(request, response);
+				// Redirection vers la page de connexion OAuth 2.0
+				redirectToLogInServlet(request, response, user);
 			}
-		} else {
-			// Redirection vers la page de connexion OAuth 2.0
-			redirectToLogInServlet(request, response, user);
 		}
 	}
 
@@ -167,68 +169,70 @@ public class PlaylistsServlet extends HttpServlet {
 
 		// Vérifie si l'utilisateur en session possède un token d'accès OAuth 2.0
 		User user = (User) request.getSession().getAttribute("user");
-		if (user != null && user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
-			try {
-				// Initialisation du service YouTube
-				ytMgr = new YouTubeManager(request.getSession());
-				if (ytMgr != null) {
-					authenticated = true;
+		if (user != null) {
+			if (user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
+				try {
+					// Initialisation du service YouTube
+					ytMgr = new YouTubeManager(request.getSession());
+					if (ytMgr != null) {
+						authenticated = true;
+					}
+				} catch (Exception ex) {
+					logger.error("Erreur d'initialisation du Service YouTube");
+					logger.error(ex.getMessage());
 				}
-			} catch (Exception ex) {
-				logger.error("Erreur d'initialisation du Service YouTube");
-				logger.error(ex.getMessage());
 			}
-		}
 
-		// Selon état de l'authentification
-		if (authenticated) {
-			// Récupère la langue de l'utilisateur (pour messages success/error)
-			String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
+			// Selon état de l'authentification
+			if (authenticated) {
+				// Récupère la langue de l'utilisateur (pour messages success/error)
+				String lang = GlobalTools.validLanguage((String) request.getSession().getAttribute("lang"));
 
-			// Récupère les informations saisies dans le formulaire
-			String action = request.getParameter("action");
-			String title = new String(request.getParameter("titlePlaylist").trim().getBytes("ISO-8859-1"), "UTF-8");
-			String description = new String(request.getParameter("descriptionPlaylist").trim().getBytes("ISO-8859-1"), "UTF-8");
-			String privacy = request.getParameter("radioPrivacy");
-			String active = request.getParameter("checkboxActive");
-			String playlistId = request.getParameter("idPlaylist");
+				// Récupère les informations saisies dans le formulaire
+				String action = request.getParameter("action");
+				String title = new String(request.getParameter("titlePlaylist").trim().getBytes("ISO-8859-1"), "UTF-8");
+				String description = new String(request.getParameter("descriptionPlaylist").trim().getBytes("ISO-8859-1"), "UTF-8");
+				String privacy = request.getParameter("radioPrivacy");
+				String active = request.getParameter("checkboxActive");
+				String playlistId = request.getParameter("idPlaylist");
 
-			// Si paramètre action est renseigné
-			if (action != null) {
-				switch (action) {
-					// Si action ajouter
-					case "add":
-						logger.info("Tentative d'ajout d'une playlist en cours ..");
+				// Si paramètre action est renseigné
+				if (action != null) {
+					switch (action) {
+						// Si action ajouter
+						case "add":
+							logger.info("Tentative d'ajout d'une playlist en cours ..");
 
-						// Essaye d'ajouter la playlist
-						playlistId = addFunction(request, user.getId(), title, description, privacy, active, lang);
+							// Essaye d'ajouter la playlist
+							playlistId = addFunction(request, user.getId(), title, description, privacy, active, lang);
 
-						// Redirection en fonction de l'ID retour
-						if (!playlistId.trim().isEmpty()) {
+							// Redirection en fonction de l'ID retour
+							if (!playlistId.trim().isEmpty()) {
+								// Redirige vers la page de détails de la playlist
+								redirectToThisServletWithUpdate(request, response, playlistId);
+							} else {
+								// Redirige vers la page de liste de playlist
+								redirectToThisServletWithList(request, response);
+							}
+							break;
+						// Si action modifier
+						case "update":
+							logger.info("Tentative de modification d'une playlist en cours ..");
+
+							// Essaye de modifier la playlist
+							updateFunction(request, user.getId(), playlistId, title, description, privacy, active, lang);
+
 							// Redirige vers la page de détails de la playlist
 							redirectToThisServletWithUpdate(request, response, playlistId);
-						} else {
-							// Redirige vers la page de liste de playlist
-							redirectToThisServletWithList(request, response);
-						}
-						break;
-					// Si action modifier
-					case "update":
-						logger.info("Tentative de modification d'une playlist en cours ..");
-
-						// Essaye de modifier la playlist
-						updateFunction(request, user.getId(), playlistId, title, description, privacy, active, lang);
-
-						// Redirige vers la page de détails de la playlist
-						redirectToThisServletWithUpdate(request, response, playlistId);
-						break;
-					default:
-						break;
+							break;
+						default:
+							break;
+					}
 				}
+			} else {
+				// Redirection vers la page de connexion OAuth 2.0
+				redirectToLogInServlet(request, response, user);
 			}
-		} else {
-			// Redirection vers la page de connexion OAuth 2.0
-			redirectToLogInServlet(request, response, user);
 		}
 	}
 

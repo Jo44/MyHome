@@ -64,89 +64,91 @@ public class ActivePlaylistServlet extends HttpServlet {
 
 		// Vérifie si l'utilisateur en session possède un token d'accès OAuth 2.0
 		User user = (User) request.getSession().getAttribute("user");
-		if (user != null && user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
-			try {
-				// Initialisation du service YouTube
-				ytMgr = new YouTubeManager(request.getSession());
-				if (ytMgr != null) {
-					authenticated = true;
+		if (user != null) {
+			if (user.getAccessToken() != null && !user.getAccessToken().trim().isEmpty()) {
+				try {
+					// Initialisation du service YouTube
+					ytMgr = new YouTubeManager(request.getSession());
+					if (ytMgr != null) {
+						authenticated = true;
+					}
+				} catch (Exception ex) {
+					logger.error("Erreur d'initialisation du Service YouTube");
+					logger.error(ex.getMessage());
 				}
-			} catch (Exception ex) {
-				logger.error("Erreur d'initialisation du Service YouTube");
-				logger.error(ex.getMessage());
 			}
-		}
 
-		// Selon état de l'authentification
-		if (authenticated) {
-			boolean active = false;
-			String playlistId = "";
-			int playlistIndex = -1;
-			JsonObject jsonResult = new JsonObject();
-			try {
-				// Récupère les paramètres de la requête
-				String activeStr = request.getParameter("checkboxActive");
-				String indexPlaylist = request.getParameter("indexPlaylist");
-				playlistId = request.getParameter("idPlaylist");
-				playlistIndex = Integer.parseInt(indexPlaylist);
+			// Selon état de l'authentification
+			if (authenticated) {
+				boolean active = false;
+				String playlistId = "";
+				int playlistIndex = -1;
+				JsonObject jsonResult = new JsonObject();
+				try {
+					// Récupère les paramètres de la requête
+					String activeStr = request.getParameter("checkboxActive");
+					String indexPlaylist = request.getParameter("indexPlaylist");
+					playlistId = request.getParameter("idPlaylist");
+					playlistIndex = Integer.parseInt(indexPlaylist);
 
-				// Détermine si la playlist doit être activée ou désactivée
-				if (activeStr != null && activeStr.equals("true")) {
-					active = true;
-				}
+					// Détermine si la playlist doit être activée ou désactivée
+					if (activeStr != null && activeStr.equals("true")) {
+						active = true;
+					}
 
-				// Récupère la playlist en base
-				ActivePlaylist playlist = ytMgr.getPlaylist(user.getId(), playlistId);
-				if (playlist == null) {
-					// Ajoute la playlist en base
-					ytMgr.addPlaylist(user.getId(), playlistId, active);
-				} else {
-					// Modifie la playlist en base
-					ytMgr.updatePlaylist(playlist, active);
-				}
+					// Récupère la playlist en base
+					ActivePlaylist playlist = ytMgr.getPlaylist(user.getId(), playlistId);
+					if (playlist == null) {
+						// Ajoute la playlist en base
+						ytMgr.addPlaylist(user.getId(), playlistId, active);
+					} else {
+						// Modifie la playlist en base
+						ytMgr.updatePlaylist(playlist, active);
+					}
 
-				// Mise à jour avec succès
-				logger.info("Mise à jour de la playlist {" + playlistId + "} réussie -> active: " + String.valueOf(active));
-				jsonResult.addProperty("state", "success");
-				jsonResult.addProperty("result", active);
-			} catch (FonctionnalException fex) {
-				if (fex instanceof TitleException) {
-					// Mise à jour échouée car titre inexistant
-					logger.error("Titre inexistant");
+					// Mise à jour avec succès
+					logger.info("Mise à jour de la playlist {" + playlistId + "} réussie -> active: " + String.valueOf(active));
+					jsonResult.addProperty("state", "success");
+					jsonResult.addProperty("result", active);
+				} catch (FonctionnalException fex) {
+					if (fex instanceof TitleException) {
+						// Mise à jour échouée car titre inexistant
+						logger.error("Titre inexistant");
+						jsonResult.addProperty("state", "error");
+						jsonResult.addProperty("result", "title");
+					} else {
+						// Mise à jour échouée car utilisateur/playlist non existant
+						logger.error("Utilisateur/Playlist inexistant");
+						jsonResult.addProperty("state", "error");
+						jsonResult.addProperty("result", "user-playlist");
+					}
+				} catch (TechnicalException tex) {
+					// Mise à jour échouée car erreur database
+					logger.error("Erreur Database");
 					jsonResult.addProperty("state", "error");
-					jsonResult.addProperty("result", "title");
-				} else {
-					// Mise à jour échouée car utilisateur/playlist non existant
-					logger.error("Utilisateur/Playlist inexistant");
+					jsonResult.addProperty("result", "database");
+				} catch (NullPointerException | NumberFormatException ex) {
+					// Mise à jour échouée car erreur de paramètres
+					logger.error("Erreur Parameters");
 					jsonResult.addProperty("state", "error");
-					jsonResult.addProperty("result", "user-playlist");
-				}
-			} catch (TechnicalException tex) {
-				// Mise à jour échouée car erreur database
-				logger.error("Erreur Database");
-				jsonResult.addProperty("state", "error");
-				jsonResult.addProperty("result", "database");
-			} catch (NullPointerException | NumberFormatException ex) {
-				// Mise à jour échouée car erreur de paramètres
-				logger.error("Erreur Parameters");
-				jsonResult.addProperty("state", "error");
-				jsonResult.addProperty("result", "parameters");
-			} finally {
-				// Ajoute l'index et l'ID de la playlist
-				jsonResult.addProperty("index", playlistIndex);
-				jsonResult.addProperty("id", playlistId);
+					jsonResult.addProperty("result", "parameters");
+				} finally {
+					// Ajoute l'index et l'ID de la playlist
+					jsonResult.addProperty("index", playlistIndex);
+					jsonResult.addProperty("id", playlistId);
 
-				// Renvoi la réponse
-				PrintWriter out = response.getWriter();
-				response.setHeader("Cache-Control", "no-cache");
-				response.setContentType("application/json");
-				response.setCharacterEncoding("UTF-8");
-				out.print(jsonResult);
-				out.flush();
+					// Renvoi la réponse
+					PrintWriter out = response.getWriter();
+					response.setHeader("Cache-Control", "no-cache");
+					response.setContentType("application/json");
+					response.setCharacterEncoding("UTF-8");
+					out.print(jsonResult);
+					out.flush();
+				}
+			} else {
+				// Redirection vers la page de connexion OAuth 2.0
+				redirectToLogInServlet(request, response, user);
 			}
-		} else {
-			// Redirection vers la page de connexion OAuth 2.0
-			redirectToLogInServlet(request, response, user);
 		}
 	}
 
