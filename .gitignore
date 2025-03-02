@@ -1,30 +1,17 @@
-# Eclipse
-.classpath
-.project
-.settings/
-how-to-deploy.readme
-
-# Compile
-target/*
-/target/
-
-# SQL
-src/main/resources/sql/
-src/test/resources/sql/
-*.sql
-
-# Hibernate
-hibernate.cfg.xml
-
-# Properties
-*.properties
-
-# CSS Plugins
-src/main/webapp/css/plugins/
-
-# JS Plugins
-src/main/webapp/js/plugins/
-
-# WEB-INF
+.git
+.settings
+src/main/resources/sql
+src/main/resources/*.properties
+src/main/resources/hibernate.cfg.xml
+src/main/resources/*.readme
+src/main/webapp/css/plugins
+src/main/webapp/js/plugins
+src/main/webapp/META-INF
 src/main/webapp/WEB-INF/classes
 src/main/webapp/WEB-INF/lib
+src/test/resources/sql
+src/test/resources/hibernate.cfg.xml
+src/test/resources/*.properties
+target
+.classpath
+.project
