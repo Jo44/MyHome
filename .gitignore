@@ -1,5 +1,6 @@
 .git
 .settings
+.vscode
 src/main/resources/sql
 src/main/resources/*.properties
 src/main/resources/hibernate.cfg.xml

@@ -52,7 +52,9 @@ public class HibernateUtil {
 		StandardServiceRegistry registry = null;
 		try {
 			logger.info("Initialisation Hibernate ...");
-			registry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+			registry = new StandardServiceRegistryBuilder()
+					.configure("/hibernate.cfg.xml")
+					.build();
 			MetadataSources sources = new MetadataSources(registry);
 			Metadata metadata = sources.getMetadataBuilder().build();
 			sessionFactory = metadata.getSessionFactoryBuilder().build();
@@ -81,7 +83,8 @@ public class HibernateUtil {
 			session = openSessionRetry(session);
 		}
 		// Renvoi exception si impossible de débuter une transaction
-		if (session == null || session.getTransaction() == null || session.getTransaction().getStatus() != TransactionStatus.ACTIVE) {
+		if (session == null || session.getTransaction() == null
+				|| session.getTransaction().getStatus() != TransactionStatus.ACTIVE) {
 			throw new TechnicalException("Impossible de débuter la transaction !");
 		}
 		logger.debug("Transaction débutée ..");
@@ -91,7 +94,8 @@ public class HibernateUtil {
 	}
 
 	/**
-	 * Râfraichis la SessionFactory et essaye de nouveau d'ouvrir une nouvelle session
+	 * Râfraichis la SessionFactory et essaye de nouveau d'ouvrir une nouvelle
+	 * session
 	 * 
 	 * @param session
 	 * @return Session
@@ -107,16 +111,19 @@ public class HibernateUtil {
 			// Ré-ouverture de la session
 			session = openSession();
 		} else {
-			// Envoi de l'email de notification de l'erreur en fonction de la langue de l'administrateur
+			// Envoi de l'email de notification de l'erreur en fonction de la langue de
+			// l'administrateur
 			GlobalTools.sendEmail(EMAIL_TARGET, EmailMessages.getProperty("error.database.object", ADMIN_LANG),
 					EmailMessages.getProperty("error.database.content", ADMIN_LANG));
-			throw new TechnicalException("Impossible de débuter la transaction apres " + nbTentative + " tentatives.. Abandon.");
+			throw new TechnicalException(
+					"Impossible de débuter la transaction apres " + nbTentative + " tentatives.. Abandon.");
 		}
 		return session;
 	}
 
 	/**
-	 * Valide la transaction (ou capte PersistenceException (Rollback automatique)) et clôture la session
+	 * Valide la transaction (ou capte PersistenceException (Rollback automatique))
+	 * et clôture la session
 	 * 
 	 * @param session
 	 * @throws PersistenceException
