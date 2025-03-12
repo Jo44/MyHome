@@ -8,7 +8,7 @@ Ce site web a été développé à partir de Mars 2021 afin de progresser dans l
 Aucune équipe, aucune deadline, aucun budget, juste de l'envie !
 
 Ce projet a été développé avec l'IDE Eclipse et mis en ligne avec un Raspberry Pi 3.
-L'architecture back-end repose sur un conteneur de servlets Java relié à une base de données MariaDB et le front-end est développé en HTML(JSP/JSTL/EL)/CSS/Javascript(jQuery).
+L'architecture back-end repose sur un conteneur de servlets Java relié à une base de données MariaDB et le front-end est développé en HTML (JSP/JSTL/EL) / CSS / Javascript (jQuery).
   
 ![003](https://github.com/user-attachments/assets/3ef900c4-5273-49e1-ba64-98a42e889c2f)  
   
